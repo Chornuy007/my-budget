@@ -135,7 +135,7 @@
                     <select id="category" class="input-field">
                         <option value="Продукти">🛒 Продукти</option>
                         <option value="Комуналка">🏠 Комуналка / Житло</option>
-                        <option value="Транспорт">🚗 Транспорт / Паливо</option>
+                        <option value="Транспорт">🚗 Transport / Паливо</option>
                         <option value="Здоров'я">🏥 Здоров'я / Ліки</option>
                         <option value="Розваги">🍿 Розваги / Кафе</option>
                         <option value="Покупки">🛍️ Покупки / Одяг</option>
@@ -147,8 +147,16 @@
                 <button type="button" onclick="addTransaction()" class="submit-btn">💾 Зберегти операцію</button>
             </div>
         </div>
-
         <!-- ІСТОРІЯ -->
         <div>
             <p class="history-title">Історія операцій</p>
             <div id="transactions-list">
+                <p class="empty-state">Записів немає. Створіть перший запис вище.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Підключаємо зовнішній файл зі скриптами -->
+    <script src="script.js"></script>
+</body>
+</html>
