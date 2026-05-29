@@ -5,158 +5,103 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Наш Бюджет</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f9fafb; margin: 0; padding-bottom: 96px; color: #111827; }
-        header { background-color: #059669; color: white; padding: 16px; position: sticky; top: 0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 50; }
-        header h1 { margin: 0; font-size: 20px; font-weight: 900; letter-spacing: -0.5px; }
-        .badge { font-size: 12px; background-color: rgba(4,120,87,0.6); font-weight: 600; padding: 6px 12px; border-radius: 9999px; border: 1px solid rgba(16,185,129,0.3); }
-        main { padding: 16px; max-width: 448px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
-        
-        /* Мультивалютний баланс */
-        .balance-card { background: linear-gradient(135deg, #059669 0%, #0d9488 100%); border-radius: 16px; padding: 20px; color: white; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        .balance-title { margin: 0 0 12px 0; color: #d1fae5; font-size: 12px; font-weight: 700; text-transform: uppercase; tracking: 1px; }
-        .balance-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-        .balance-box { background-color: rgba(6,95,70,0.3); padding: 10px; border-radius: 12px; border: 1px solid rgba(52,211,153,0.2); }
-        .balance-box p { margin: 0; font-size: 12px; color: #a7f3d0; }
-        .balance-box .amount { font-size: 20px; font-weight: 900; margin-top: 2px; color: white; }
-        
-        /* Форма */
-        .form-card { background-color: white; border-radius: 16px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f3f4f6; display: flex; flex-direction: column; gap: 16px; }
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
-        .form-group label { font-size: 12px; font-weight: 700; color: #9ca3af; text-transform: uppercase; tracking: 1px; }
-        .btn-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-        .btn-grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-        
-        /* Кнопки вибору */
-        .selector-btn { background-color: #f9fafb; color: #6b7280; font-weight: 600; padding: 14px 10px; border-radius: 12px; border: 1px solid #e5e7eb; font-size: 14px; text-align: center; cursor: pointer; transition: all 0.15s ease-in-out; display: block; width: 100%; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        .active-btn { background-color: #059669 !important; color: white !important; font-weight: 700 !important; border-color: #059669 !important; box-shadow: 0 4px 6px -1px rgba(5,150,105,0.2); transform: scale(1.02); }
-        
-        /* Поля введення */
-        .input-field { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #e5e7eb; font-size: 16px; box-sizing: border-box; outline: none; transition: border 0.2s; -webkit-tap-highlight-color: transparent; }
-        .input-field:focus { border-color: #059669; box-shadow: 0 0 0 3px rgba(5,150,105,0.1); }
-        .amount-input { font-size: 24px; font-weight: 900; text-align: center; }
-        select.input-field { background-color: white; height: 52px; cursor: pointer; }
-        .submit-btn { width: 100%; background-color: #059669; color: white; font-weight: 800; padding: 16px; border-radius: 12px; border: none; font-size: 16px; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-top: 8px; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
-        .submit-btn:active { transform: scale(0.97); background-color: #047857; }
-        
-        /* Історія транзакцій */
-        .history-title { font-size: 12px; font-weight: 700; color: #9ca3af; text-transform: uppercase; tracking: 1px; padding: 0 4px; margin: 0 0 8px 0; }
-        .empty-state { text-align: center; color: #9ca3af; padding: 24px; font-size: 14px; background-color: white; border-radius: 12px; border: 1px solid #f3f4f6; margin: 0; }
-        .transaction-item { background-color: white; padding: 16px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #ef4444; margin-bottom: 10px; }
-        .income-item { border-left-color: #10b981 !important; }
-        .item-info { display: flex; flex-direction: column; gap: 4px; }
-        .item-tags { display: flex; align-items: center; gap: 6px; }
-        .tag-user { font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 6px; }
-        .tag-male { background-color: #eff6ff; color: #2563eb; }
-        .tag-female { background-color: #fdf2f8; color: #db2777; }
-        .tag-source { font-size: 11px; color: #9ca3af; font-weight: 600; }
-        .item-category { font-weight: 700; color: #1f2937; font-size: 14px; margin: 0; }
-        .item-date { font-size: 11px; color: #9ca3af; margin: 0; }
-        .item-amount { font-size: 16px; font-weight: 900; margin: 0; }
-        .amount-income { color: #059669; }
-        .amount-expense { color: #ef4444; }
+        body { font-family: sans-serif; background-color: #f9fafb; margin: 0; padding: 16px; color: #111827; }
+        header { background-color: #059669; color: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; text-align: center; }
+        header h1 { margin: 0; font-size: 20px; font-weight: 900; }
+        .card { background: white; padding: 16px; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; margin-bottom: 15px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
+        label { font-size: 11px; font-weight: 700; color: #9ca3af; text-transform: uppercase; display: block; margin-bottom: 4px; }
+        .btn { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 13px; }
+        .active { background: #059669 !important; color: white !important; border-color: #059669 !important; }
+        .input { width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 16px; box-sizing: border-box; margin-bottom: 12px; }
+        .submit { width: 100%; background: #059669; color: white; border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; }
+        .item { background: white; padding: 12px; border-radius: 10px; border-left: 4px solid #ef4444; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .inc { border-left-color: #10b981; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>🍏 НАШ БЮДЖЕТ</h1>
-        <div class="badge">Сімейний облік</div>
-    </header>
+    <header><h1>🍏 НАШ БЮДЖЕТ</h1></header>
 
-    <main>
-        <!-- МУЛЬТИВАЛЮТНИЙ БАЛАНС -->
-        <div class="balance-card">
-            <p class="balance-title">Поточні залишки коштів</p>
-            <div class="balance-grid">
-                <div class="balance-box">
-                    <p>Гривня (UAH)</p>
-                    <div class="amount" id="bal-UAH">0.00 ₴</div>
-                </div>
-                <div class="balance-box">
-                    <p>Долар (USD)</p>
-                    <div class="amount" id="bal-USD">0.00 $</div>
-                </div>
-                <div class="balance-box">
-                    <p>Євро (EUR)</p>
-                    <div class="amount" id="bal-EUR">0.00 €</div>
-                </div>
-                <div class="balance-box">
-                    <p>Злотий (PLN)</p>
-                    <div class="amount" id="bal-PLN">0.00 zł</div>
-                </div>
-            </div>
+    <!-- БАЛАНСИ -->
+    <div class="card" style="background: #059669; color: white;">
+        <div class="grid-2">
+            <div>Гривня: <b id="b-UAH">0.00 ₴</b></div>
+            <div>Долар: <b id="b-USD">0.00 $</b></div>
+            <div>Євро: <b id="b-EUR">0.00 €</b></div>
+            <div>Злотий: <b id="b-PLN">0.00 zł</b></div>
         </div>
+    </div>
 
-        <!-- ФОРМА ВВЕДЕННЯ ДАНИХ -->
-        <div class="form-card">
-            
-            <div class="form-group">
-                <label>Тип операції</label>
-                <div class="btn-grid">
-                    <button type="button" onclick="setParam('type', 'expense')" id="type-expense" class="selector-btn active-btn">💸 Витрата</button>
-                    <button type="button" onclick="setParam('type', 'income')" id="type-income" class="selector-btn">📈 Дохід</button>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Хто проводить</label>
-                <div class="btn-grid">
-                    <button type="button" onclick="setParam('user', 'Чоловік')" id="user-Чоловік" class="selector-btn active-btn">🙋‍♂️ Чоловік</button>
-                    <button type="button" onclick="setParam('user', 'Дружина')" id="user-Дружина" class="selector-btn">🙋‍♀️ Дружина</button>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Джерело коштів</label>
-                <div class="btn-grid">
-                    <button type="button" onclick="setParam('source', 'Карта')" id="source-Карта" class="selector-btn active-btn">💳 Карта</button>
-                    <button type="button" onclick="setParam('source', 'Готівка')" id="source-Готівка" class="selector-btn">💵 Готівка</button>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Валюта</label>
-                <div class="btn-grid-4">
-                    <button type="button" onclick="setParam('currency', 'UAH')" id="curr-UAH" class="selector-btn active-btn">UAH</button>
-                    <button type="button" onclick="setParam('currency', 'USD')" id="curr-USD" class="selector-btn">USD</button>
-                    <button type="button" onclick="setParam('currency', 'EUR')" id="curr-EUR" class="selector-btn">EUR</button>
-                    <button type="button" onclick="setParam('currency', 'PLN')" id="curr-PLN" class="selector-btn">PLN</button>
-                </div>
-            </div>
-
-            <div style="border-top: 1px solid #f3f4f6; padding-top: 12px; display: flex; flex-direction: column; gap: 12px;">
-                <div class="form-group">
-                    <label>Сума</label>
-                    <input type="number" id="amount" placeholder="0.00" class="input-field amount-input" inputmode="decimal">
-                </div>
-
-                <div class="form-group">
-                    <label>Категорія</label>
-                    <select id="category" class="input-field">
-                        <option value="Продукти">🛒 Продукти</option>
-                        <option value="Комуналка">🏠 Комуналка / Житло</option>
-                        <option value="Транспорт">🚗 Transport / Паливо</option>
-                        <option value="Здоров'я">🏥 Здоров'я / Ліки</option>
-                        <option value="Розваги">🍿 Розваги / Кафе</option>
-                        <option value="Покупки">🛍️ Покупки / Одяг</option>
-                        <option value="Зарплата">💼 Зарплата / Дохід</option>
-                        <option value="Інше">✨ Інше</option>
-                    </select>
-                </div>
-
-                <button type="button" onclick="addTransaction()" class="submit-btn">💾 Зберегти операцію</button>
-            </div>
+    <!-- ФОРМА -->
+    <div class="card">
+        <label>Тип</label>
+        <div class="grid-2">
+            <button onclick="set('type','expense')" id="t-expense" class="btn active">💸 Витрата</button>
+            <button onclick="set('type','income')" id="t-income" class="btn">📈 Дохід</button>
         </div>
-        <!-- ІСТОРІЯ -->
-        <div>
-            <p class="history-title">Історія операцій</p>
-            <div id="transactions-list">
-                <p class="empty-state">Записів немає. Створіть перший запис вище.</p>
-            </div>
+        <label>Хто</label>
+        <div class="grid-2">
+            <button onclick="set('user','Чоловік')" id="u-Чоловік" class="btn active">🙋‍♂️ Чоловік</button>
+            <button onclick="set('user','Дружина')" id="u-Дружина" class="btn">🙋‍♀️ Дружина</button>
         </div>
-    </main>
+        <label>Джерело</label>
+        <div class="grid-2">
+            <button onclick="set('source','Карта')" id="s-Карта" class="btn active">💳 Карта</button>
+            <button onclick="set('source','Готівка')" id="s-Готівка" class="btn">💵 Готівка</button>
+        </div>
+        <label>Валюта</label>
+        <div class="grid-4">
+            <button onclick="set('curr','UAH')" id="c-UAH" class="btn active">UAH</button>
+            <button onclick="set('curr','USD')" id="c-USD" class="btn">USD</button>
+            <button onclick="set('curr','EUR')" id="c-EUR" class="btn">EUR</button>
+            <button onclick="set('curr','PLN')" id="c-PLN" class="btn">PLN</button>
+        </div>
+        <label>Сума</label>
+        <input type="number" id="amount" placeholder="0.00" class="input" inputmode="decimal">
+        <label>Категорія</label>
+        <select id="category" class="input">
+            <option value="Продукти">🛒 Продукти</option>
+            <option value="Комуналка">🏠 Комуналка</option>
+            <option value="Транспорт">🚗 Транспорт</option>
+            <option value="Інше">✨ Інше</option>
+        </select>
+        <button onclick="add()" class="submit">💾 Зберегти</button>
+    </div>
 
-    <!-- Підключаємо зовнішній файл зі скриптами -->
-    <script src="script.js"></script>
+    <label>Історія операцій</label>
+    <div id="list"></div>
+
+    <script>
+        let form = { type: 'expense', user: 'Чоловік', source: 'Карта', curr: 'UAH' };
+        let list = [];
+        const sym = { UAH: '₴', USD: '$', EUR: '€', PLN: 'zł' };
+
+        function set(p, v) {
+            form[p] = v;
+            if(p==='type'){ document.getElementById('t-expense').className = `btn ${v==='expense'?'active':''}`; document.getElementById('t-income').className = `btn ${v==='income'?'active':''}`; }
+            if(p==='user'){ document.getElementById('u-Чоловік').className = `btn ${v==='Чоловік'?'active':''}`; document.getElementById('u-Дружина').className = `btn ${v==='Дружина'?'active':''}`; }
+            if(p==='source'){ document.getElementById('s-Карта').className = `btn ${v==='Карта'?'active':''}`; document.getElementById('s-Готівка').className = `btn ${v==='Готівка'?'active':''}`; }
+            if(p==='curr'){ ['UAH','USD','EUR','PLN'].forEach(c => document.getElementById(`c-${c}`).className = `btn ${v===c?'active':''}`); }
+        }
+        function add() {
+            const am = document.getElementById('amount');
+            if (!am.value || am.value <= 0) return alert('Введіть суму!');
+            const now = new Date();
+            list.unshift({ id: Date.now(), ...form, amount: parseFloat(am.value), cat: document.getElementById('category').value, date: now.toLocaleDateString('uk-UA') + ', ' + now.toLocaleTimeString('uk-UA', {hour:'2-digit', minute:'2-digit'}) });
+            am.value = '';
+            update();
+        }
+        function update() {
+            const el = document.getElementById('list'); el.innerHTML = '';
+            let bal = { UAH: 0, USD: 0, EUR: 0, PLN: 0 };
+            list.forEach(t => {
+                bal[t.curr] += (t.type === 'income' ? t.amount : -t.amount);
+                el.innerHTML += `<div class="item ${t.type==='income'?'inc':''}"><small><b>${t.user}</b> (${t.source})<br>${t.cat}<br>${t.date}</small><b style="color:${t.type==='income'?'#059669':'#ef4444'}">${t.type==='income'?'+':'-'}${t.amount.toFixed(2)} ${sym[t.curr]}</b></div>`;
+            });
+            ['UAH','USD','EUR','PLN'].forEach(c => document.getElementById(`b-${c}`).innerText = `${bal[c].toFixed(2)} ${sym[c]}`);
+        }
+    </script>
 </body>
 </html>
