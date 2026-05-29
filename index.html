@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Наш Бюджет</title>
-    <!-- Підключаємо сучасну версію Tailwind CSS -->
+    <!-- ПРАВИЛЬНЕ ПІДКЛЮЧЕННЯ TAILWIND CSS -->
     <script src="https://jsdelivr.net"></script>
     <style>
         /* Стиль для активних кнопок-перемикачів */
@@ -129,7 +129,6 @@
     </main>
 
     <script>
-        // Поточний стан вибору користувача
         let currentForm = {
             type: 'expense',
             user: 'Чоловік',
@@ -139,16 +138,14 @@
 
         let transactions = [];
 
-        // Встановлюємо сьогоднішню дату в календар при завантаженні сторінки
         document.getElementById('date').value = new Date().toISOString().split('T')[0];
 
-        // Функція для перемикання кнопок
         function setParam(param, value) {
             currentForm[param] = value;
             
-            // Скидаємо стилі для групи кнопок і ставимо активний стиль вибраній
             if (param === 'type') {
                 document.getElementById('type-expense').className = value === 'expense' ? 'active-btn py-3 rounded-xl border text-center text-sm font-medium transition-all' : 'py-3 rounded-xl border border-gray-200 text-center text-sm font-medium text-gray-500 transition-all';
                 document.getElementById('type-income').className = value === 'income' ? 'active-btn py-3 rounded-xl border text-center text-sm font-medium transition-all' : 'py-3 rounded-xl border border-gray-200 text-center text-sm font-medium text-gray-500 transition-all';
             }
             if (param === 'user') {
+                document.getElementById('user-Чоловік').className = value === 'Чоловік' ? 'active-btn py-2.5 rounded-xl border text-center text-sm font-medium transition-all' : 'py-2.5 rounded-xl border border-gray-200 text-center text-sm font-medium text-gray-500 transition-all';
