@@ -96,7 +96,9 @@
         let list = [];
         const sym = { UAH: '₴', USD: '$', EUR: '€', PLN: 'zł' };
 
-        const url = "https://googleapis.com";
+        // ДОДАНО ВАШ ОСОБИСТИЙ КЛЮЧ АВТОРИЗАЦІЇ FIREBASE KEY
+        const apiKey = "AIzaSyA_WHG4yV4URzQh-H3tCrMCJSKdChRGoJo";
+        const url = `https://googleapis.com{apiKey}`;
 
         function setParam(p, v) {
             form[p] = v;
@@ -122,16 +124,17 @@
             };
 
             try {
-                await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+                const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+                if(!res.ok) { const err = await res.json(); alert("Помилка хмари: " + err.error.message); return; }
                 am.value = '';
                 loadTransactions();
-            } catch (e) { alert("Помилка збереження: " + e.message); }
+            } catch (e) { alert("Помилка мережі: " + e.message); }
         }
 
         async function removeTransaction(docName) {
             if(confirm('Видалити цей запис?')) {
                 try {
-                    await fetch(`https://googleapis.com{docName}`, { method: "DELETE" });
+                    await fetch(`https://googleapis.com{docName}?key=${apiKey}`, { method: "DELETE" });
                     loadTransactions();
                 } catch (e) { alert("Помилка видалення"); }
             }
@@ -139,7 +142,7 @@
 
         async function loadTransactions() {
             try {
-                const res = await fetch(`${url}?pageSize=100`);
+                const res = await fetch(`${url}&pageSize=100`);
                 const data = await res.json();
                 list = [];
                 if (data.documents) {
@@ -168,7 +171,3 @@
             list.forEach(t => {
                 bal[t.curr] += (t.type === 'income' ? t.amount : -t.amount);
                 if(t.type === 'expense') {
-                    if(!cats[t.cat]) cats[t.cat] = { UAH: 0, USD: 0, EUR: 0, PLN: 0 };
-                    cats[t.cat][t.curr] += t.amount;
-                }
-                const uClass = t.user === 'Чоловік' ? 'u-male' : 'u-female';
