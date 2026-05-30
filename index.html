@@ -25,103 +25,6 @@
         .u-female { background: #fdf2f8; color: #db2777; }
         .stat-line { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; border-bottom: 1px dashed #f3f4f6; }
     </style>
-    <script>
-        // Оголошуємо логіку на самому початку файлу, щоб кнопки завжди були клікабельними
-        window.form = { type: 'expense', user: 'Чоловік', source: 'Карта', curr: 'UAH' };
-        window.list = [];
-        window.sym = { UAH: '₴', USD: '$', EUR: '€', PLN: 'zł' };
-
-        const apiKey = "AIzaSyA_WHG4yV4URzQh-H3tCrMCJSKdChRGoJo";
-        const url = "https://googleapis.com" + apiKey;
-
-        window.setParam = function(p, v) {
-            window.form[p] = v;
-            if(p==='type'){ document.getElementById('t-expense').className = "btn " + (v==='expense'?'active':''); document.getElementById('t-income').className = "btn " + (v==='income'?'active':''); }
-            if(p==='user'){ document.getElementById('u-Чоловік').className = "btn " + (v==='Чоловік'?'active':''); document.getElementById('u-Дружина').className = "btn " + (v==='Дружина'?'active':''); }
-            if(p==='source'){ document.getElementById('s-Карта').className = "btn " + (v==='Карта'?'active':''); document.getElementById('s-Готівка').className = "btn " + (v==='Готівка'?'active':''); }
-            if(p==='curr'){ ['UAH','USD','EUR','PLN'].forEach(function(c) { document.getElementById('c-' + c).className = "btn " + (v===c?'active':''); }); }
-        }
-
-        window.addTransaction = async function() {
-            const am = document.getElementById('amount');
-            if (!am.value || am.value <= 0) return alert('Введіть суму!');
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('uk-UA') + ', ' + now.toLocaleTimeString('uk-UA', {hour:'2-digit', minute:'2-digit'});
-
-            const data = {
-                fields: {
-                    type: { stringValue: window.form.type }, user: { stringValue: window.form.user },
-                    source: { stringValue: window.form.source }, curr: { stringValue: window.form.curr },
-                    amount: { doubleValue: parseFloat(am.value) }, cat: { stringValue: document.getElementById('category').value },
-                    date: { stringValue: dateStr }, timestamp: { integerValue: Date.now().toString() }
-                }
-            };
-
-            try {
-                const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
-                if(!res.ok) { const err = await res.json(); alert("Помилка хмари: " + err.error.message); return; }
-                am.value = '';
-                window.loadTransactions();
-            } catch (e) { alert("Помилка мережі: " + e.message); }
-        }
-
-        window.removeTransaction = async function(docName) {
-            if(confirm('Видалити цей запис?')) {
-                try {
-                    await fetch("https://googleapis.com" + docName + "?key=" + apiKey, { method: "DELETE" });
-                    window.loadTransactions();
-                } catch (e) { alert("Помилка видалення"); }
-            }
-        }
-
-        window.loadTransactions = async function() {
-            try {
-                const res = await fetch(url + "&pageSize=100");
-                const data = await res.json();
-                window.list = [];
-                if (data.documents) {
-                    data.documents.forEach(function(d) {
-                        const f = d.fields;
-                        window.list.push({
-                            id: d.name,
-                            type: f.type.stringValue, user: f.user.stringValue,
-                            source: f.source.stringValue, curr: f.curr.stringValue,
-                            amount: parseFloat(f.amount.doubleValue || f.amount.integerValue),
-                            cat: f.cat.stringValue, date: f.date.stringValue,
-                            timestamp: parseInt(f.timestamp.integerValue)
-                        });
-                    });
-                    window.list.sort(function(a,b) { return b.timestamp - a.timestamp; });
-                }
-                window.updateUI();
-            } catch (e) { console.log(e); }
-        }
-
-        window.updateUI = function() {
-            const el = document.getElementById('list'); el.innerHTML = '';
-            const stEl = document.getElementById('stats-list'); stEl.innerHTML = '';
-            let bal = { UAH: 0, USD: 0, EUR: 0, PLN: 0 }; let cats = {};
-
-            window.list.forEach(function(t) {
-                bal[t.curr] += (t.type === 'income' ? t.amount : -t.amount);
-                if(t.type === 'expense') {
-                    if(!cats[t.cat]) cats[t.cat] = { UAH: 0, USD: 0, EUR: 0, PLN: 0 };
-                    cats[t.cat][t.curr] += t.amount;
-                }
-                const uClass = t.user === 'Чоловік' ? 'u-male' : 'u-female';
-                el.innerHTML += '<div class="item ' + (t.type==='income'?'inc':'') + '"><small><span class="u-tag ' + uClass + '">' + t.user + '</span> • <b>' + t.source + '</b><br>' + t.cat + '<br>' + t.date + '</small><div style="display:flex;align-items:center;"><b style="color:' + (t.type==='income'?'#059669':'#ef4444') + '">' + (t.type==='income'?'+':'-') + t.amount.toFixed(2) + ' ' + window.sym[t.curr] + '</b><button onclick="window.removeTransaction(\'' + t.id + '\')" class="del-btn">✕</button></div></div>';
-            });
-
-            let hasStats = false;
-            for (let c in cats) {
-                let text = [];
-                for(let curr in cats[c]) { if(cats[c][curr] > 0) text.push(cats[c][curr].toFixed(2) + ' ' + window.sym[curr]); }
-                if(text.length > 0) { hasStats = true; stEl.innerHTML += '<div class="stat-line"><span>' + c + '</span><b>' + text.join(' | ') + '</b></div>'; }
-            }
-            document.getElementById('stats-card').style.display = hasStats ? 'block' : 'none';
-            ['UAH','USD','EUR','PLN'].forEach(function(c) { document.getElementById('b-' + c).innerText = bal[c].toFixed(2) + ' ' + window.sym[c]; });
-        }
-    </script>
 </head>
 <body>
 
@@ -141,16 +44,129 @@
     <div class="card">
         <label>Тип</label>
         <div class="grid-2">
-            <button onclick="window.setParam('type','expense')" id="t-expense" class="btn active">💸 Витрата</button>
-            <button onclick="window.setParam('type','income')" id="t-income" class="btn">📈 Дохід</button>
+            <button onclick="setParam('type','expense')" id="t-expense" class="btn active">💸 Витрата</button>
+            <button onclick="setParam('type','income')" id="t-income" class="btn">📈 Дохід</button>
         </div>
         <label>Хто</label>
         <div class="grid-2">
-            <button onclick="window.setParam('user','Чоловік')" id="u-Чоловік" class="btn active">🙋‍♂️ Чоловік</button>
-            <button onclick="window.setParam('user','Дружина')" id="u-Дружина" class="btn">🙋‍♀️ Дружина</button>
+            <button onclick="setParam('user','Чоловік')" id="u-Чоловік" class="btn active">🙋‍♂️ Чоловік</button>
+            <button onclick="setParam('user','Дружина')" id="u-Дружина" class="btn">🙋‍♀️ Дружина</button>
         </div>
         <label>Джерело</label>
         <div class="grid-2">
-            <button onclick="window.setParam('source','Карта')" id="s-Карта" class="btn active">💳 Карта</button>
-            <button onclick="window.setParam('source','Готівка')" id="s-Готівка" class="btn">💵 Готівка</button>
+            <button onclick="setParam('source','Карта')" id="s-Карта" class="btn active">💳 Карта</button>
+            <button onclick="setParam('source','Готівка')" id="s-Готівка" class="btn">💵 Готівка</button>
         </div>
+        <label>Валюта</label>
+        <div class="grid-4">
+            <button onclick="setParam('curr','UAH')" id="c-UAH" class="btn active">UAH</button>
+            <button onclick="setParam('curr','USD')" id="c-USD" class="btn">USD</button>
+            <button onclick="setParam('curr','EUR')" id="c-EUR" class="btn">EUR</button>
+            <button onclick="setParam('curr','PLN')" id="c-PLN" class="btn">PLN</button>
+        </div>
+        <label>Сума</label>
+        <input type="number" id="amount" placeholder="0.00" class="input" inputmode="decimal">
+        <label>Категорія</label>
+        <select id="category" class="input">
+            <option value="🛒 Продукти">🛒 Продукти</option>
+            <option value="🏠 Комуналка">🏠 Комуналка</option>
+            <option value="🚗 Транспорт">🚗 Транспорт / Авто</option>
+            <option value="👶 Дитина">👶 Дитина</option>
+            <option value="📉 Кредит">📉 Кредит / Борги</option>
+            <option value="🏥 Здоров'я">🏥 Здоров'я / Ліки</option>
+            <option value="🛍️ Покупки">🛍️ Покупки / Одяг</option>
+            <option value="🍿 Розваги">🍿 Розваги / Кафе</option>
+            <option value="💼 Зарплата">💼 Зарплата / Дохід</option>
+            <option value="✨ Інше">✨ Інше</option>
+        </select>
+        <button onclick="addTransaction()" class="submit">💾 Зберегти в хмару</button>
+    </div>
+
+    <!-- АНАЛІТИКА -->
+    <div class="card" id="stats-card" style="display:none;">
+        <label>📊 Витрати за категоріями</label>
+        <div id="stats-list" style="margin-top: 5px;"></div>
+    </div>
+
+    <label>Історія операцій (Реальний час)</label>
+    <div id="list"></div>
+
+    <script>
+        let form = { type: 'expense', user: 'Чоловік', source: 'Карта', curr: 'UAH' };
+        let list = [];
+        const sym = { UAH: '₴', USD: '$', EUR: '€', PLN: 'zł' };
+
+        const apiKey = "AIzaSyA_WHG4yV4URzQh-H3tCrMCJSKdChRGoJo";
+        const url = "https://googleapis.com" + apiKey;
+
+        function setParam(p, v) {
+            form[p] = v;
+            if(p==='type'){ document.getElementById('t-expense').className = "btn " + (v==='expense'?'active':''); document.getElementById('t-income').className = "btn " + (v==='income'?'active':''); }
+            if(p==='user'){ document.getElementById('u-Чоловік').className = "btn " + (v==='Чоловік'?'active':''); document.getElementById('u-Дружина').className = "btn " + (v==='Дружина'?'active':''); }
+            if(p==='source'){ document.getElementById('s-Карта').className = "btn " + (v==='Карта'?'active':''); document.getElementById('s-Готівка').className = "btn " + (v==='Готівка'?'active':''); }
+            if(p==='curr'){ ['UAH','USD','EUR','PLN'].forEach(function(c) { document.getElementById('c-' + c).className = "btn " + (v===c?'active':''); }); }
+        }
+
+        async function addTransaction() {
+            const am = document.getElementById('amount');
+            if (!am.value || am.value <= 0) return alert('Введіть суму!');
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('uk-UA') + ', ' + now.toLocaleTimeString('uk-UA', {hour:'2-digit', minute:'2-digit'});
+
+            const data = {
+                fields: {
+                    type: { stringValue: form.type }, user: { stringValue: form.user },
+                    source: { stringValue: form.source }, curr: { stringValue: form.curr },
+                    amount: { doubleValue: parseFloat(am.value) }, cat: { stringValue: document.getElementById('category').value },
+                    date: { stringValue: dateStr }, timestamp: { integerValue: Date.now().toString() }
+                }
+            };
+
+            try {
+                const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+                if(!res.ok) { const err = await res.json(); alert("Помилка хмари: " + err.error.message); return; }
+                am.value = '';
+                loadTransactions();
+            } catch (e) { alert("Помилка мережі: " + e.message); }
+        }
+
+        async function removeTransaction(docName) {
+            if(confirm('Видалити цей запис?')) {
+                try {
+                    await fetch("https://googleapis.com" + docName + "?key=" + apiKey, { method: "DELETE" });
+                    loadTransactions();
+                } catch (e) { alert("Помилка видалення"); }
+            }
+        }
+
+        async function loadTransactions() {
+            try {
+                const res = await fetch(url + "&pageSize=100");
+                const data = await res.json();
+                list = [];
+                if (data.documents) {
+                    data.documents.forEach(function(d) {
+                        const f = d.fields;
+                        list.push({
+                            id: d.name,
+                            type: f.type.stringValue, user: f.user.stringValue,
+                            source: f.source.stringValue, curr: f.curr.stringValue,
+                            amount: parseFloat(f.amount.doubleValue || f.amount.integerValue),
+                            cat: f.cat.stringValue, date: f.date.stringValue,
+                            timestamp: parseInt(f.timestamp.integerValue)
+                        });
+                    });
+                    list.sort(function(a,b) { return b.timestamp - a.timestamp; });
+                }
+                updateUI();
+            } catch (e) { console.log(e); }
+        }
+
+        function updateUI() {
+            const el = document.getElementById('list'); el.innerHTML = '';
+            const stEl = document.getElementById('stats-list'); stEl.innerHTML = '';
+            let bal = { UAH: 0, USD: 0, EUR: 0, PLN: 0 }; let cats = {};
+
+            list.forEach(function(t) {
+                bal[t.curr] += (t.type === 'income' ? t.amount : -t.amount);
+                if(t.type === 'expense') {
