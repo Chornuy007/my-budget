@@ -1,14 +1,13 @@
 var form = { type: 'expense', user: 'Чоловік', source: 'Карта', curr: 'UAH' };
 var list = [];
 var sym = { UAH: 'UAH', USD: 'USD', EUR: 'EUR', PLN: 'PLN' };
-var apiKey = "AIzaSyA_WHG4yV4URzQh-H3tCrMCJSKdChRGoJo";
-var url = "https://googleapis.com" + apiKey;
+var url = "https://googleapis.com";
 
 function setParam(p, v) {
     form[p] = v;
     if(p==='type'){ document.getElementById('t-expense').className = "btn " + (v==='expense'?'active':''); document.getElementById('t-income').className = "btn " + (v==='income'?'active':''); }
     if(p==='user'){ document.getElementById('u-Чоловік').className = "btn " + (v==='Чоловік'?'active':''); document.getElementById('u-Дружина').className = "btn " + (v==='Дружина'?'active':''); }
-    if(p==='source'){ document.getElementById('s-Карта').className = "btn " + (v==='Карta'?'active':''); document.getElementById('s-Готівка').className = "btn " + (v==='Готівка'?'active':''); }
+    if(p==='source'){ document.getElementById('s-Карта').className = "btn " + (v==='Карта'?'active':''); document.getElementById('s-Готівка').className = "btn " + (v==='Готівка'?'active':''); }
     if(p==='curr'){ ['UAH','USD','EUR','PLN'].forEach(function(c) { document.getElementById('c-' + c).className = "btn " + (v===c?'active':''); }); }
 }
 
@@ -18,14 +17,14 @@ async function addTransaction() {
     var data = { fields: { type: { stringValue: form.type }, user: { stringValue: form.user }, source: { stringValue: form.source }, curr: { stringValue: form.curr }, amount: { doubleValue: parseFloat(am.value) }, cat: { stringValue: document.getElementById('category').value }, date: { stringValue: dateStr }, timestamp: { integerValue: Date.now().toString() } } };
     try {
         var res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
-        if(!res.ok) { var err = await res.json(); alert("Помилка: " + err.error.message); return; }
+        if(!res.ok) { var err = await res.json(); alert("Помилка хмари: " + err.error.message); return; }
         am.value = ''; loadTransactions();
-    } catch (e) { alert("Помилка мережі"); }
+    } catch (e) { alert("Помилка мережі: " + e.message); }
 }
 
 async function removeTransaction(docName) {
     if(confirm('Видалити цей запис?')) {
-        try { await fetch("https://googleapis.com" + docName + "?key=" + apiKey, { method: "DELETE" }); loadTransactions(); } catch (e) { alert("Помилка видалення"); }
+        try { await fetch("https://googleapis.com" + docName + "?key=AIzaSyA_WHG4yV4URzQh-H3tCrMCJSKdChRGoJo", { method: "DELETE" }); loadTransactions(); } catch (e) { alert("Помилка видалення"); }
     }
 }
 
@@ -56,7 +55,7 @@ function updateUI() {
     var hasStats = false;
     for (var c in cats) {
         var text = []; for(var curr in cats[c]) { if(cats[c][curr] > 0) text.push(cats[c][curr].toFixed(2) + ' ' + sym[curr]); }
-        if(text.length > 0) { hasStats = true; stEl.innerHTML += '<div class="stat-line"><span>' + c + '</span><b>' + text.join(' | ')}</b></div>`; }
+        if(text.length > 0) { hasStats = true; stEl.innerHTML += '<div class="stat-line"><span>' + c + '</span><b>' + text.join(' | ') + '</b></div>'; }
     }
     document.getElementById('stats-card').style.display = hasStats ? 'block' : 'none';
     ['UAH','USD','EUR','PLN'].forEach(function(c) { document.getElementById('b-' + c).innerText = bal[c].toFixed(2) + ' ' + sym[c]; });
