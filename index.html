@@ -24,11 +24,8 @@
         .u-male { background: #eff6ff; color: #2563eb; }
         .u-female { background: #fdf2f8; color: #db2777; }
         .stat-line { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; border-bottom: 1px dashed #f3f4f6; }
+        .share-btn { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; padding: 10px; border-radius: 10px; font-weight: 700; font-size: 12px; width: 100%; cursor: pointer; }
     </style>
-
-    <!-- ПІДКЛЮЧЕННЯ FIREBASE СТАНДАРТНИМ МЕТОДОМ -->
-    <script src="https://gstatic.com"></script>
-    <script src="https://gstatic.com"></script>
 </head>
 <body>
 
@@ -42,6 +39,12 @@
             <div>Євро: <b id="b-EUR">0.00 €</b></div>
             <div>Злотий: <b id="b-PLN">0.00 zł</b></div>
         </div>
+    </div>
+
+    <!-- СИНХРОНІЗАЦІЯ ДЛЯ СІМ'Ї -->
+    <div class="grid-2" style="margin-bottom: 15px;">
+        <button onclick="exportData()" class="share-btn">📤 Надіслати дані (Viber)</button>
+        <button onclick="importData()" class="share-btn" style="background:#f0fdf4; color:#16a34a; border-color:#bbf7d0;">📥 Оновити від партнера</button>
     </div>
 
     <!-- ФОРМА ВВЕДЕННЯ -->
@@ -83,7 +86,7 @@
             <option value="💼 Зарплата">💼 Зарплата / Дохід</option>
             <option value="✨ Інше">✨ Інше</option>
         </select>
-        <button onclick="addTransaction()" class="submit">💾 Зберегти в хмару</button>
+        <button onclick="addTransaction()" class="submit">💾 Зберегти операцію</button>
     </div>
 
     <!-- АНАЛІТИКА -->
@@ -92,24 +95,14 @@
         <div id="stats-list" style="margin-top: 5px;"></div>
     </div>
 
-    <label>Історія операцій (Спільна Хмара)</label>
+    <label>Історія операцій (Локальна пам'ять)</label>
     <div id="list"></div>
+    
+    <button onclick="clearAll()" style="width:100%; background:none; border:1px solid #fca5a5; color:#ef4444; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; margin-top:15px;">🧹 Очистити всю історію</button>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyA_WHG4yV4URzQh-H3tCrMCJSKdChRGoJo",
-            authDomain: "://firebaseapp.com",
-            projectId: "our-family-budget-257ae",
-            storageBucket: "our-family-budget-257ae.firebasestorage.app",
-            messagingSenderId: "833744570673",
-            appId: "1:833744570673:web:c465d0d787bd1aa710c810"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const transactionsCol = db.collection("transactions");
-
         let form = { type: 'expense', user: 'Чоловік', source: 'Карта', curr: 'UAH' };
+        let list = JSON.parse(localStorage.getItem('budget_records_v2')) || [];
         const sym = { UAH: '₴', USD: '$', EUR: '€', PLN: 'zł' };
 
         function setParam(p, v) {
@@ -120,53 +113,55 @@
             if(p==='curr'){ ['UAH','USD','EUR','PLN'].forEach(c => document.getElementById(`c-${c}`).className = `btn ${v===c?'active':''}`); }
         }
 
-        async function addTransaction() {
+        function addTransaction() {
             const am = document.getElementById('amount');
             if (!am.value || am.value <= 0) return alert('Введіть суму!');
             const now = new Date();
             const dateStr = now.toLocaleDateString('uk-UA') + ', ' + now.toLocaleTimeString('uk-UA', {hour:'2-digit', minute:'2-digit'});
             
-            try {
-                await transactionsCol.add({
-                    ...form,
-                    amount: parseFloat(am.value),
-                    cat: document.getElementById('category').value,
-                    date: dateStr,
-                    timestamp: Date.now()
-                });
-                am.value = '';
-            } catch (e) { alert("Помилка хмари: " + e.message); }
+            list.unshift({ id: Date.now(), ...form, amount: parseFloat(am.value), cat: document.getElementById('category').value, date: dateStr });
+            localStorage.setItem('budget_records_v2', JSON.stringify(list));
+            am.value = '';
+            update();
         }
 
-        async function removeTransaction(id) {
+        function removeTransaction(id) {
             if(confirm('Видалити цей запис?')) {
-                await transactionsCol.doc(id).delete();
+                list = list.filter(t => t.id !== id);
+                localStorage.setItem('budget_records_v2', JSON.stringify(list));
+                update();
             }
         }
 
-        transactionsCol.onSnapshot((snapshot) => {
-            const el = document.getElementById('list'); el.innerHTML = '';
-            const stEl = document.getElementById('stats-list'); stEl.innerHTML = '';
-            let bal = { UAH: 0, USD: 0, EUR: 0, PLN: 0 };
-            let cats = {};
+        function clearAll() {
+            if(confirm('Ви впевнені, що хочете повністю видалити всю історію?')) {
+                list = [];
+                localStorage.removeItem('budget_records_v2');
+                update();
+            }
+        }
 
-            const docs = [];
-            snapshot.forEach(doc => docs.push({id: doc.id, ...doc.data()}));
-            docs.sort((a,b) => b.timestamp - a.timestamp);
+        // Функція для створення коду обміну даних
+        window.exportData = function() {
+            if(list.length === 0) return alert('Історія порожня, немає чим ділитися!');
+            const base64Str = btoa(unescape(encodeURIComponent(JSON.stringify(list))));
+            navigator.clipboard.writeText(base64Str);
+            alert('Код вашого бюджету скопійовано! Надішліть його дружині у Viber та попросіть натиснути кнопку "Оновити від партнера".');
+        }
 
-            docs.forEach(t => {
-                bal[t.curr] += (t.type === 'income' ? t.amount : -t.amount);
-                if(t.type === 'expense') {
-                    if(!cats[t.cat]) cats[t.cat] = { UAH: 0, USD: 0, EUR: 0, PLN: 0 };
-                    cats[t.cat][t.curr] += t.amount;
-                }
-                const uClass = t.user === 'Чоловік' ? 'u-male' : 'u-female';
-                el.innerHTML += `<div class="item ${t.type==='income'?'inc':''}"><small><span class="u-tag ${uClass}">${t.user}</span> • <b>${t.source}</b><br>${t.cat}<br>${t.date}</small><div style="display:flex;align-items:center;"><b style="color:${t.type==='income'?'#059669':'#ef4444'}">${t.type==='income'?'+':'-'}${t.amount.toFixed(2)} ${sym[t.curr]}</b><button onclick="removeTransaction('${t.id}')" class="del-btn">✕</button></div></div>`;
-            });
-
-            let hasStats = false;
-            for (let c in cats) {
-                let text = [];
-                for(let curr in cats[c]) { if(cats[c][curr] > 0) text.push(`${cats[c][curr].toFixed(2)} ${sym[curr]}`); }
-                if(text.length > 0) {
-                    hasStats = true;
+        // Функція для прийому даних від партнера
+        window.importData = function() {
+            const code = prompt('Вставте скопійованный код від вашого партнера сюди:');
+            if(!code) return;
+            try {
+                const importedList = JSON.parse(decodeURIComponent(escape(atob(code))));
+                // Об'єднуємо два списки за унікальним id, щоб записи не дублювалися
+                let combined = [...list, ...importedList];
+                let uniqueMap = new Map();
+                combined.forEach(item => uniqueMap.set(item.id, item));
+                list = Array.from(uniqueMap.values());
+                list.sort((a,b) => b.id - a.id);
+                
+                localStorage.setItem('budget_records_v2', JSON.stringify(list));
+                update();
+                alert('Спільний бюджет успішно оновлено!');
