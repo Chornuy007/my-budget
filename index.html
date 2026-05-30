@@ -12,7 +12,7 @@
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
         .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
         label { font-size: 11px; font-weight: 700; color: #9ca3af; text-transform: uppercase; display: block; margin-bottom: 4px; }
-        .btn { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 13px; }
+        .btn { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 13px; text-align: center; width: 100%; box-sizing: border-box; }
         .active { background: #059669 !important; color: white !important; border-color: #059669 !important; }
         .input { width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 16px; box-sizing: border-box; margin-bottom: 12px; }
         .submit { width: 100%; background: #059669; color: white; border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; }
@@ -44,25 +44,25 @@
     <div class="card">
         <label>Тип</label>
         <div class="grid-2">
-            <button onclick="set('type','expense')" id="t-expense" class="btn active">💸 Витрата</button>
-            <button onclick="set('type','income')" id="t-income" class="btn">📈 Дохід</button>
+            <button data-p="type" data-v="expense" id="t-expense" class="btn active">💸 Витрата</button>
+            <button data-p="type" data-v="income" id="t-income" class="btn">📈 Дохід</button>
         </div>
         <label>Хто</label>
         <div class="grid-2">
-            <button onclick="set('user','Чоловік')" id="u-Чоловік" class="btn active">🙋‍♂️ Чоловік</button>
-            <button onclick="set('user','Дружина')" id="u-Дружина" class="btn">🙋‍♀️ Дружина</button>
+            <button data-p="user" data-v="Чоловік" id="u-Чоловік" class="btn active">🙋‍♂️ Чоловік</button>
+            <button data-p="user" data-v="Дружина" id="u-Дружина" class="btn">🙋‍♀️ Дружина</button>
         </div>
         <label>Джерело</label>
         <div class="grid-2">
-            <button onclick="set('source','Карта')" id="s-Карта" class="btn active">💳 Карта</button>
-            <button onclick="set('source','Готівка')" id="s-Готівка" class="btn">💵 Готівка</button>
+            <button data-p="source" data-v="Карта" id="s-Карта" class="btn active">💳 Карта</button>
+            <button data-p="source" data-v="Готівка" id="s-Готівка" class="btn">💵 Готівка</button>
         </div>
         <label>Валюта</label>
         <div class="grid-4">
-            <button onclick="set('curr','UAH')" id="c-UAH" class="btn active">UAH</button>
-            <button onclick="set('curr','USD')" id="c-USD" class="btn">USD</button>
-            <button onclick="set('curr','EUR')" id="c-EUR" class="btn">EUR</button>
-            <button onclick="set('curr','PLN')" id="c-PLN" class="btn">PLN</button>
+            <button data-p="curr" data-v="UAH" id="c-UAH" class="btn active">UAH</button>
+            <button data-p="curr" data-v="USD" id="c-USD" class="btn">USD</button>
+            <button data-p="curr" data-v="EUR" id="c-EUR" class="btn">EUR</button>
+            <button data-p="curr" data-v="PLN" id="c-PLN" class="btn">PLN</button>
         </div>
         <label>Сума</label>
         <input type="number" id="amount" placeholder="0.00" class="input" inputmode="decimal">
@@ -79,7 +79,7 @@
             <option value="💼 Зарплата">💼 Зарплата / Дохід</option>
             <option value="✨ Інше">✨ Інше</option>
         </select>
-        <button onclick="add()" class="submit">💾 Зберегти в хмару</button>
+        <button id="submit-btn" class="submit">💾 Зберегти в хмару</button>
     </div>
 
     <!-- АНАЛІТИКА -->
@@ -91,12 +91,11 @@
     <label>Історія операцій (Хмара)</label>
     <div id="list"></div>
 
-    <!-- ПІДКЛЮЧЕННЯ ФІРМОВИХ СКРИПТІВ FIREBASE -->
+    <!-- ПІДКЛЮЧЕННЯ FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://gstatic.com";
         import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc } from "https://gstatic.com";
 
-        // Повна конфігурація з усіма ключами з вашого фото
         const firebaseConfig = {
             apiKey: "AIzaSyA_WHG4yV4URzQh-H3tCrMCJSKdChRGoJo",
             authDomain: "://firebaseapp.com",
@@ -110,18 +109,24 @@
         const db = getFirestore(app);
         const transactionsCol = collection(db, "transactions");
 
-        window.form = { type: 'expense', user: 'Чоловік', source: 'Карта', curr: 'UAH' };
-        window.sym = { UAH: '₴', USD: '$', EUR: '€', PLN: 'zł' };
+        let form = { type: 'expense', user: 'Чоловік', source: 'Карта', curr: 'UAH' };
+        const sym = { UAH: '₴', USD: '$', EUR: '€', PLN: 'zł' };
 
-        window.set = function(p, v) {
-            window.form[p] = v;
-            if(p==='type'){ document.getElementById('t-expense').className = `btn ${v==='expense'?'active':''}`; document.getElementById('t-income').className = `btn ${v==='income'?'active':''}`; }
-            if(p==='user'){ document.getElementById('u-Чоловік').className = `btn ${v==='Чоловік'?'active':''}`; document.getElementById('u-Дружина').className = `btn ${v==='Дружина'?'active':''}`; }
-            if(p==='source'){ document.getElementById('s-Карта').className = `btn ${v==='Карта'?'active':''}`; document.getElementById('s-Готівка').className = `btn ${v==='Готівка'?'active':''}`; }
-            if(p==='curr'){ ['UAH','USD','EUR','PLN'].forEach(c => document.getElementById(`c-${c}`).className = `btn ${v===c?'active':''}`); }
-        }
+        // Сучасний і надійний спосіб обробки кліків
+        document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const p = e.target.getAttribute('data-p');
+                const v = e.target.getAttribute('data-v');
+                form[p] = v;
 
-        window.add = async function() {
+                if(p==='type'){ document.getElementById('t-expense').className = `btn ${v==='expense'?'active':''}`; document.getElementById('t-income').className = `btn ${v==='income'?'active':''}`; }
+                if(p==='user'){ document.getElementById('u-Чоловік').className = `btn ${v==='Чоловік'?'active':''}`; document.getElementById('u-Дружина').className = `btn ${v==='Дружина'?'active':''}`; }
+                if(p==='source'){ document.getElementById('s-Карта').className = `btn ${v==='Карта'?'active':''}`; document.getElementById('s-Готівка').className = `btn ${v==='Готівка'?'active':''}`; }
+                if(p==='curr'){ ['UAH','USD','EUR','PLN'].forEach(c => document.getElementById(`c-${c}`).className = `btn ${v===c?'active':''}`); }
+            });
+        });
+
+        document.getElementById('submit-btn').addEventListener('click', async () => {
             const am = document.getElementById('amount');
             if (!am.value || am.value <= 0) return alert('Введіть суму!');
             const now = new Date();
@@ -129,7 +134,7 @@
             
             try {
                 await addDoc(transactionsCol, {
-                    ...window.form,
+                    ...form,
                     amount: parseFloat(am.value),
                     cat: document.getElementById('category').value,
                     date: dateStr,
@@ -137,13 +142,17 @@
                 });
                 am.value = '';
             } catch (e) { alert("Помилка збереження: " + e.message); }
-        }
+        });
 
-        window.remove = async function(id) {
-            if(confirm('Видалити цей запис із хмари?')) {
-                await deleteDoc(doc(db, "transactions", id));
+        // Видалення через безпечне слухання подій
+        document.getElementById('list').addEventListener('click', async (e) => {
+            if (e.target.classList.contains('del-btn')) {
+                const id = e.target.getAttribute('data-id');
+                if(confirm('Видалити цей запис із хмари?')) {
+                    await deleteDoc(doc(db, "transactions", id));
+                }
             }
-        }
+        });
 
         onSnapshot(transactionsCol, (snapshot) => {
             const el = document.getElementById('list'); el.innerHTML = '';
@@ -162,12 +171,3 @@
                     cats[t.cat][t.curr] += t.amount;
                 }
                 const uClass = t.user === 'Чоловік' ? 'u-male' : 'u-female';
-                el.innerHTML += `<div class="item ${t.type==='income'?'inc':''}"><small><span class="u-tag ${uClass}">${t.user}</span> • <b>${t.source}</b><br>${t.cat}<br>${t.date}</small><div style="display:flex;align-items:center;"><b style="color:${t.type==='income'?'#059669':'#ef4444'}">${t.type==='income'?'+':'-'}${t.amount.toFixed(2)} ${window.sym[t.curr]}</b><button onclick="remove('${t.id}')" class="del-btn">✕</button></div></div>`;
-            });
-
-            let hasStats = false;
-            for (let c in cats) {
-                let text = [];
-                for(let curr in cats[c]) { if(cats[c][curr] > 0) text.push(`${cats[c][curr].toFixed(2)} ${window.sym[curr]}`); }
-                if(text.length > 0) {
-                    hasStats = true;
