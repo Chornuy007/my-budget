@@ -44,25 +44,25 @@
     <div class="card">
         <label>Тип</label>
         <div class="grid-2">
-            <button data-p="type" data-v="expense" id="t-expense" class="btn active">💸 Витрата</button>
-            <button data-p="type" data-v="income" id="t-income" class="btn">📈 Дохід</button>
+            <button onclick="window.setParam('type','expense')" id="t-expense" class="btn active">💸 Витрата</button>
+            <button onclick="window.setParam('type','income')" id="t-income" class="btn">📈 Дохід</button>
         </div>
         <label>Хто</label>
         <div class="grid-2">
-            <button data-p="user" data-v="Чоловік" id="u-Чоловік" class="btn active">🙋‍♂️ Чоловік</button>
-            <button data-p="user" data-v="Дружина" id="u-Дружина" class="btn">🙋‍♀️ Дружина</button>
+            <button onclick="window.setParam('user','Чоловік')" id="u-Чоловік" class="btn active">🙋‍♂️ Чоловік</button>
+            <button onclick="window.setParam('user','Дружина')" id="u-Дружина" class="btn">🙋‍♀️ Дружина</button>
         </div>
         <label>Джерело</label>
         <div class="grid-2">
-            <button data-p="source" data-v="Карта" id="s-Карта" class="btn active">💳 Карта</button>
-            <button data-p="source" data-v="Готівка" id="s-Готівка" class="btn">💵 Готівка</button>
+            <button onclick="window.setParam('source','Карта')" id="s-Карта" class="btn active">💳 Карта</button>
+            <button onclick="window.setParam('source','Готівка')" id="s-Готівка" class="btn">💵 Готівка</button>
         </div>
         <label>Валюта</label>
         <div class="grid-4">
-            <button data-p="curr" data-v="UAH" id="c-UAH" class="btn active">UAH</button>
-            <button data-p="curr" data-v="USD" id="c-USD" class="btn">USD</button>
-            <button data-p="curr" data-v="EUR" id="c-EUR" class="btn">EUR</button>
-            <button data-p="curr" data-v="PLN" id="c-PLN" class="btn">PLN</button>
+            <button onclick="window.setParam('curr','UAH')" id="c-UAH" class="btn active">UAH</button>
+            <button onclick="window.setParam('curr','USD')" id="c-USD" class="btn">USD</button>
+            <button onclick="window.setParam('curr','EUR')" id="c-EUR" class="btn">EUR</button>
+            <button onclick="window.setParam('curr','PLN')" id="c-PLN" class="btn">PLN</button>
         </div>
         <label>Сума</label>
         <input type="number" id="amount" placeholder="0.00" class="input" inputmode="decimal">
@@ -79,7 +79,7 @@
             <option value="💼 Зарплата">💼 Зарплата / Дохід</option>
             <option value="✨ Інше">✨ Інше</option>
         </select>
-        <button id="submit-btn" class="submit">💾 Зберегти в хмару</button>
+        <button onclick="window.addTransaction()" class="submit">💾 Зберегти в хмару</button>
     </div>
 
     <!-- АНАЛІТИКА -->
@@ -112,21 +112,16 @@
         let form = { type: 'expense', user: 'Чоловік', source: 'Карта', curr: 'UAH' };
         const sym = { UAH: '₴', USD: '$', EUR: '€', PLN: 'zł' };
 
-        // Сучасний і надійний спосіб обробки кліків
-        document.querySelectorAll('.btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const p = e.target.getAttribute('data-p');
-                const v = e.target.getAttribute('data-v');
-                form[p] = v;
+        // Реєструємо функції у глобальному об'єкті window, щоб HTML їх чітко бачив
+        window.setParam = function(p, v) {
+            form[p] = v;
+            if(p==='type'){ document.getElementById('t-expense').className = `btn ${v==='expense'?'active':''}`; document.getElementById('t-income').className = `btn ${v==='income'?'active':''}`; }
+            if(p==='user'){ document.getElementById('u-Чоловік').className = `btn ${v==='Чоловік'?'active':''}`; document.getElementById('u-Дружина').className = `btn ${v==='Дружина'?'active':''}`; }
+            if(p==='source'){ document.getElementById('s-Карта').className = `btn ${v==='Карта'?'active':''}`; document.getElementById('s-Готівка').className = `btn ${v==='Готівка'?'active':''}`; }
+            if(p==='curr'){ ['UAH','USD','EUR','PLN'].forEach(c => document.getElementById(`c-${c}`).className = `btn ${v===c?'active':''}`); }
+        }
 
-                if(p==='type'){ document.getElementById('t-expense').className = `btn ${v==='expense'?'active':''}`; document.getElementById('t-income').className = `btn ${v==='income'?'active':''}`; }
-                if(p==='user'){ document.getElementById('u-Чоловік').className = `btn ${v==='Чоловік'?'active':''}`; document.getElementById('u-Дружина').className = `btn ${v==='Дружина'?'active':''}`; }
-                if(p==='source'){ document.getElementById('s-Карта').className = `btn ${v==='Карта'?'active':''}`; document.getElementById('s-Готівка').className = `btn ${v==='Готівка'?'active':''}`; }
-                if(p==='curr'){ ['UAH','USD','EUR','PLN'].forEach(c => document.getElementById(`c-${c}`).className = `btn ${v===c?'active':''}`); }
-            });
-        });
-
-        document.getElementById('submit-btn').addEventListener('click', async () => {
+        window.addTransaction = async function() {
             const am = document.getElementById('amount');
             if (!am.value || am.value <= 0) return alert('Введіть суму!');
             const now = new Date();
@@ -142,17 +137,13 @@
                 });
                 am.value = '';
             } catch (e) { alert("Помилка збереження: " + e.message); }
-        });
+        }
 
-        // Видалення через безпечне слухання подій
-        document.getElementById('list').addEventListener('click', async (e) => {
-            if (e.target.classList.contains('del-btn')) {
-                const id = e.target.getAttribute('data-id');
-                if(confirm('Видалити цей запис із хмари?')) {
-                    await deleteDoc(doc(db, "transactions", id));
-                }
+        window.removeTransaction = async function(id) {
+            if(confirm('Видалити цей запис із хмари?')) {
+                await deleteDoc(doc(db, "transactions", id));
             }
-        });
+        }
 
         onSnapshot(transactionsCol, (snapshot) => {
             const el = document.getElementById('list'); el.innerHTML = '';
@@ -171,3 +162,9 @@
                     cats[t.cat][t.curr] += t.amount;
                 }
                 const uClass = t.user === 'Чоловік' ? 'u-male' : 'u-female';
+                el.innerHTML += `<div class="item ${t.type==='income'?'inc':''}"><small><span class="u-tag ${uClass}">${t.user}</span> • <b>${t.source}</b><br>${t.cat}<br>${t.date}</small><div style="display:flex;align-items:center;"><b style="color:${t.type==='income'?'#059669':'#ef4444'}">${t.type==='income'?'+':'-'}${t.amount.toFixed(2)} ${sym[t.curr]}</b><button onclick="window.removeTransaction('${t.id}')" class="del-btn">✕</button></div></div>`;
+            });
+
+            let hasStats = false;
+            for (let c in cats) {
+                let text = [];
