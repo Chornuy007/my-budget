@@ -8,7 +8,7 @@ function setParam(p, v) {
     form[p] = v;
     if(p==='type'){ document.getElementById('t-expense').className = "btn " + (v==='expense'?'active':''); document.getElementById('t-income').className = "btn " + (v==='income'?'active':''); }
     if(p==='user'){ document.getElementById('u-Чоловік').className = "btn " + (v==='Чоловік'?'active':''); document.getElementById('u-Дружина').className = "btn " + (v==='Дружина'?'active':''); }
-    if(p==='source'){ document.getElementById('s-Карта').className = "btn " + (v==='Карта'?'active':''); document.getElementById('s-Готівка').className = "btn " + (v==='Готівка'?'active':''); }
+    if(p==='source'){ document.getElementById('s-Карта').className = "btn " + (v==='Карta'?'active':''); document.getElementById('s-Готівка').className = "btn " + (v==='Готівка'?'active':''); }
     if(p==='curr'){ ['UAH','USD','EUR','PLN'].forEach(function(c) { document.getElementById('c-' + c).className = "btn " + (v===c?'active':''); }); }
 }
 
@@ -56,7 +56,7 @@ function updateUI() {
     var hasStats = false;
     for (var c in cats) {
         var text = []; for(var curr in cats[c]) { if(cats[c][curr] > 0) text.push(cats[c][curr].toFixed(2) + ' ' + sym[curr]); }
-        if(text.length > 0) { hasStats = true; stEl.innerHTML += '<div class="stat-line"><span>' + c + '</span><b>' + text.join(' | ') + '</b></div>'; }
+        if(text.length > 0) { hasStats = true; stEl.innerHTML += '<div class="stat-line"><span>' + c + '</span><b>' + text.join(' | ')}</b></div>`; }
     }
     document.getElementById('stats-card').style.display = hasStats ? 'block' : 'none';
     ['UAH','USD','EUR','PLN'].forEach(function(c) { document.getElementById('b-' + c).innerText = bal[c].toFixed(2) + ' ' + sym[c]; });
