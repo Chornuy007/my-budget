@@ -18,6 +18,12 @@
         .submit { width: 100%; background: #059669; color: white; border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; }
         .item { background: white; padding: 12px; border-radius: 10px; border-left: 4px solid #ef4444; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .inc { border-left-color: #10b981; }
+        .del-btn { color: #9ca3af; background: none; border: none; font-size: 16px; cursor: pointer; padding-left: 10px; }
+        .del-btn:hover { color: #ef4444; }
+        .u-tag { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; display: inline-block; margin-bottom: 3px; }
+        .u-male { background: #eff6ff; color: #2563eb; }
+        .u-female { background: #fdf2f8; color: #db2777; }
+        .stat-line { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; border-bottom: 1px dashed #f3f4f6; }
     </style>
 </head>
 <body>
@@ -25,7 +31,7 @@
     <header><h1>🍏 НАШ БЮДЖЕТ</h1></header>
 
     <!-- БАЛАНСИ -->
-    <div class="card" style="background: #059669; color: white;">
+    <div class="card" style="background: linear-gradient(135deg, #059669 0%, #0d9488 100%); color: white;">
         <div class="grid-2">
             <div>Гривня: <b id="b-UAH">0.00 ₴</b></div>
             <div>Долар: <b id="b-USD">0.00 $</b></div>
@@ -34,7 +40,7 @@
         </div>
     </div>
 
-    <!-- ФОРМА -->
+    <!-- ФОРМА ВВЕДЕННЯ -->
     <div class="card">
         <label>Тип</label>
         <div class="grid-2">
@@ -62,16 +68,28 @@
         <input type="number" id="amount" placeholder="0.00" class="input" inputmode="decimal">
         <label>Категорія</label>
         <select id="category" class="input">
-            <option value="Продукти">🛒 Продукти</option>
-            <option value="Комуналка">🏠 Комуналка</option>
-            <option value="Транспорт">🚗 Транспорт</option>
-            <option value="Інше">✨ Інше</option>
+            <option value="🛒 Продукти">🛒 Продукти</option>
+            <option value="🏠 Комуналка">🏠 Комуналка</option>
+            <option value="🚗 Транспорт">🚗 Транспорт / Авто</option>
+            <option value="🏥 Здоров'я">🏥 Здоров'я / Ліки</option>
+            <option value="🛍️ Покупки">🛍️ Покупки / Одяг</option>
+            <option value="🍿 Розваги">🍿 Розваги / Кафе</option>
+            <option value="💼 Зарплата">💼 Зарплата / Дохід</option>
+            <option value="✨ Інше">✨ Інше</option>
         </select>
-        <button onclick="add()" class="submit">💾 Зберегти</button>
+        <button onclick="add()" class="submit">💾 Зберегти операцію</button>
+    </div>
+
+    <!-- АНАЛІТИКА ЗА КАТЕГОРІЯМИ -->
+    <div class="card" id="stats-card" style="display:none;">
+        <label>📊 Витрати за категоріями</label>
+        <div id="stats-list" style="margin-top: 5px;"></div>
     </div>
 
     <label>Історія операцій</label>
     <div id="list"></div>
+    
+    <button onclick="clearAll()" style="width:100%; background:none; border:1px solid #fca5a5; color:#ef4444; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; margin-top:15px;">🧹 Очистити всю історію</button>
 
     <script>
         let form = { type: 'expense', user: 'Чоловік', source: 'Карта', curr: 'UAH' };
@@ -93,13 +111,50 @@
             am.value = '';
             update();
         }
+        function remove(id) {
+            if(confirm('Видалити цей запис?')) {
+                list = list.filter(t => t.id !== id);
+                update();
+            }
+        }
+        function clearAll() {
+            if(confirm('Ви впевнені, що хочете повністю очистити всю історію?')) {
+                list = [];
+                update();
+            }
+        }
         function update() {
             const el = document.getElementById('list'); el.innerHTML = '';
+            const stEl = document.getElementById('stats-list'); stEl.innerHTML = '';
             let bal = { UAH: 0, USD: 0, EUR: 0, PLN: 0 };
+            let cats = {}; // Для підрахунку категорій
+
             list.forEach(t => {
                 bal[t.curr] += (t.type === 'income' ? t.amount : -t.amount);
-                el.innerHTML += `<div class="item ${t.type==='income'?'inc':''}"><small><b>${t.user}</b> (${t.source})<br>${t.cat}<br>${t.date}</small><b style="color:${t.type==='income'?'#059669':'#ef4444'}">${t.type==='income'?'+':'-'}${t.amount.toFixed(2)} ${sym[t.curr]}</b></div>`;
+                
+                // Рахуємо витрати за категоріями (доходи ігноруємо в аналітиці витрат)
+                if(t.type === 'expense') {
+                    if(!cats[t.cat]) cats[t.cat] = { UAH: 0, USD: 0, EUR: 0, PLN: 0 };
+                    cats[t.cat][t.curr] += t.amount;
+                }
+
+                const uClass = t.user === 'Чоловік' ? 'u-male' : 'u-female';
+                el.innerHTML += `<div class="item ${t.type==='income'?'inc':''}"><small><span class="u-tag ${uClass}">${t.user}</span> • <b>${t.source}</b><br>${t.cat}<br>${t.date}</small><div style="display:flex;align-items:center;"><b style="color:${t.type==='income'?'#059669':'#ef4444'}">${t.type==='income'?'+':'-'}${t.amount.toFixed(2)} ${sym[t.curr]}</b><button onclick="remove(${t.id})" class="del-btn">✕</button></div></div>`;
             });
+
+            // Виводимо аналітику за категоріями
+            let hasStats = false;
+            for (let c in cats) {
+                let text = [];
+                for(let curr in cats[c]) {
+                    if(cats[c][curr] > 0) text.push(`${cats[c][curr].toFixed(2)} ${sym[curr]}`);
+                }
+                if(text.length > 0) {
+                    hasStats = true;
+                    stEl.innerHTML += `<div class="stat-line"><span>${c}</span><b>${text.join(' | ')}</b></div>`;
+                }
+            }
+            document.getElementById('stats-card').style.display = hasStats ? 'block' : 'none';
             ['UAH','USD','EUR','PLN'].forEach(c => document.getElementById(`b-${c}`).innerText = `${bal[c].toFixed(2)} ${sym[c]}`);
         }
     </script>
