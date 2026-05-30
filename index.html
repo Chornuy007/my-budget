@@ -71,6 +71,8 @@
             <option value="🛒 Продукти">🛒 Продукти</option>
             <option value="🏠 Комуналка">🏠 Комуналка</option>
             <option value="🚗 Транспорт">🚗 Транспорт / Авто</option>
+            <option value="👶 Дитина">👶 Дитина</option>
+            <option value="📉 Кредит">📉 Кредит / Борги</option>
             <option value="🏥 Здоров'я">🏥 Здоров'я / Ліки</option>
             <option value="🛍️ Покупки">🛍️ Покупки / Одяг</option>
             <option value="🍿 Розваги">🍿 Розваги / Кафе</option>
@@ -127,12 +129,11 @@
             const el = document.getElementById('list'); el.innerHTML = '';
             const stEl = document.getElementById('stats-list'); stEl.innerHTML = '';
             let bal = { UAH: 0, USD: 0, EUR: 0, PLN: 0 };
-            let cats = {}; // Для підрахунку категорій
+            let cats = {};
 
             list.forEach(t => {
                 bal[t.curr] += (t.type === 'income' ? t.amount : -t.amount);
                 
-                // Рахуємо витрати за категоріями (доходи ігноруємо в аналітиці витрат)
                 if(t.type === 'expense') {
                     if(!cats[t.cat]) cats[t.cat] = { UAH: 0, USD: 0, EUR: 0, PLN: 0 };
                     cats[t.cat][t.curr] += t.amount;
@@ -142,7 +143,6 @@
                 el.innerHTML += `<div class="item ${t.type==='income'?'inc':''}"><small><span class="u-tag ${uClass}">${t.user}</span> • <b>${t.source}</b><br>${t.cat}<br>${t.date}</small><div style="display:flex;align-items:center;"><b style="color:${t.type==='income'?'#059669':'#ef4444'}">${t.type==='income'?'+':'-'}${t.amount.toFixed(2)} ${sym[t.curr]}</b><button onclick="remove(${t.id})" class="del-btn">✕</button></div></div>`;
             });
 
-            // Виводимо аналітику за категоріями
             let hasStats = false;
             for (let c in cats) {
                 let text = [];
