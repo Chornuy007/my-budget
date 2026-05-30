@@ -95,12 +95,10 @@
 
     <script>
         let form = { type: 'expense', user: 'Чоловік', source: 'Карта', curr: 'UAH' };
-        
-        // Автоматично завантажуємо старі записи з пам'яті пристрою, якщо вони там є
         let list = JSON.parse(localStorage.getItem('budget_records')) || [];
         const sym = { UAH: '₴', USD: '$', EUR: '€', PLN: 'zł' };
 
-        window.setParam = function(p, v) {
+        function setParam(p, v) {
             form[p] = v;
             if(p==='type'){ document.getElementById('t-expense').className = `btn ${v==='expense'?'active':''}`; document.getElementById('t-income').className = `btn ${v==='income'?'active':''}`; }
             if(p==='user'){ document.getElementById('u-Чоловік').className = `btn ${v==='Чоловік'?'active':''}`; document.getElementById('u-Дружина').className = `btn ${v==='Дружина'?'active':''}`; }
@@ -108,7 +106,7 @@
             if(p==='curr'){ ['UAH','USD','EUR','PLN'].forEach(c => document.getElementById(`c-${c}`).className = `btn ${v===c?'active':''}`); }
         }
 
-        window.addTransaction = function() {
+        function addTransaction() {
             const am = document.getElementById('amount');
             if (!am.value || am.value <= 0) return alert('Введіть суму!');
             const now = new Date();
@@ -122,13 +120,12 @@
                 date: dateStr
             });
             
-            // Надійно записуємо в пам'ять пристрою
             localStorage.setItem('budget_records', JSON.stringify(list));
             am.value = '';
             update();
         }
 
-        window.removeTransaction = function(id) {
+        function removeTransaction(id) {
             if(confirm('Видалити цей запис?')) {
                 list = list.filter(t => t.id !== id);
                 localStorage.setItem('budget_records', JSON.stringify(list));
@@ -136,7 +133,7 @@
             }
         }
 
-        window.clearAll = function() {
+        function clearAll() {
             if(confirm('Ви впевнені, що хочете повністю видалити всю історію та баланси?')) {
                 list = [];
                 localStorage.removeItem('budget_records');
@@ -157,7 +154,7 @@
                     cats[t.cat][t.curr] += t.amount;
                 }
                 const uClass = t.user === 'Чоловік' ? 'u-male' : 'u-female';
-                el.innerHTML += `<div class="item ${t.type==='income'?'inc':''}"><small><span class="u-tag ${uClass}">${t.user}</span> • <b>${t.source}</b><br>${t.cat}<br>${t.date}</small><div style="display:flex;align-items:center;"><b style="color:${t.type==='income'?'#059669':'#ef4444'}">${t.type==='income'?'+':'-'}${t.amount.toFixed(2)} ${sym[t.curr]}</b><button onclick="window.removeTransaction(${t.id})" class="del-btn">✕</button></div></div>`;
+                el.innerHTML += `<div class="item ${t.type==='income'?'inc':''}"><small><span class="u-tag ${uClass}">${t.user}</span> • <b>${t.source}</b><br>${t.cat}<br>${t.date}</small><div style="display:flex;align-items:center;"><b style="color:${t.type==='income'?'#059669':'#ef4444'}">${t.type==='income'?'+':'-'}${t.amount.toFixed(2)} ${sym[t.curr]}</b><button onclick="removeTransaction(${t.id})" class="del-btn">✕</button></div></div>`;
             });
 
             let hasStats = false;
@@ -169,3 +166,9 @@
                     stEl.innerHTML += `<div class="stat-line"><span>${c}</span><b>${text.join(' | ')}</b></div>`;
                 }
             }
+            document.getElementById('stats-card').style.display = hasStats ? 'block' : 'none';
+            ['UAH','USD','EUR','PLN'].forEach(c => document.getElementById(`b-${c}`).innerText = `${bal[c].toFixed(2)} ${sym[c]}`);
+        }
+
+        update();
+    </script>
