@@ -9,7 +9,6 @@
         header { background: #059669; color: #fff; padding: 14px; border-radius: 14px; margin-bottom: 15px; text-align: center; }
         header h2 { margin: 0; font-size: 20px; letter-spacing: 0.5px; }
         
-        /* Стильний блок балансу */
         .balance-card { background: #059669; color: #fff; padding: 14px; border-radius: 14px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 15px; }
         .balance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; }
         .balance-item { background: rgba(255, 255, 255, 0.15); padding: 8px; border-radius: 8px; font-size: 14px; }
@@ -31,7 +30,6 @@
         .history-label { font-weight: 700; font-size: 14px; color: #374151; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 4px; }
         .clear-link { color: #ef4444; cursor: pointer; font-size: 12px; font-weight: normal; }
 
-        /* Елементи історії */
         .item { background: #fff; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.02); border-left: 4px solid #e5e7eb; }
         .item-expense { border-left-color: #ef4444; }
         .item-income { border-left-color: #059669; }
@@ -48,7 +46,6 @@
     <h2>🍏 МІЙ БЮДЖЕТ</h2>
 </header>
 
-<!-- Блок балансів -->
 <div class="balance-card">
     <div class="balance-grid">
         <div class="balance-item">UAH <b id="b-UAH">0.00</b></div>
@@ -59,19 +56,16 @@
 </div>
 
 <div class="card">
-    <!-- Вибір типу -->
     <div class="grid">
         <button onclick="set('type','expense')" id="t-expense" class="btn active">💸 Витрата</button>
         <button onclick="set('type','income')" id="t-income" class="btn">📈 Дохід</button>
     </div>
     
-    <!-- Вибір користувача (кожен бачить лише свій вибір) -->
     <div class="grid">
         <button onclick="set('user','Чоловік')" id="u-Чоловік" class="btn active">🙋‍♂️ Чоловік</button>
         <button onclick="set('user','Дружина')" id="u-Дружина" class="btn">🙋‍♀️ Дружина</button>
     </div>
     
-    <!-- Вибір валюти -->
     <div class="grid-4">
         <button onclick="set('curr','UAH')" id="c-UAH" class="btn active">UAH</button>
         <button onclick="set('curr','USD')" id="c-USD" class="btn">USD</button>
@@ -79,21 +73,23 @@
         <button onclick="set('curr','PLN')" id="c-PLN" class="btn">PLN</button>
     </div>
     
-    <!-- Введення суми та категорії -->
     <input type="number" id="amount" placeholder="Сума 0.00" class="input" inputmode="decimal">
     
+    <!-- Оновлений список категорій -->
     <select id="category" class="input">
         <option value="🛒 Продукти">🛒 Продукти</option>
-        <option value="🏠 Комуналка">🏠 Комуналка</option>
+        <option value="🚗 Авто / Транспорт">🚗 Авто / Транспорт</option>
+        <option value="🏠 Комуналка та Інтернет">🏠 Комуналка та Інтернет</option>
+        <option value="🏥 Здоров'я / Медицина">🏥 Здоров'я / Медицина</option>
+        <option value="💳 Кредит / Борги">💳 Кредит / Борги</option>
+        <option value="🎉 Розваги / Відпочинок">🎉 Розваги / Відпочинок</option>
         <option value="👶 Дитина">👶 Дитина</option>
-        <option value="🚗 Транспорт">🚗 Транспорт</option>
         <option value="✨ Інше">✨ Інше</option>
     </select>
     
     <button onclick="add()" class="submit">💾 Зберегти локально</button>
 </div>
 
-<!-- Історія -->
 <div class="history-label">
     <span>Історія операцій (Локальна)</span>
     <span class="clear-link" onclick="clearAll()">🗑 Очистити все</span>
@@ -101,11 +97,9 @@
 <div id="list"></div>
 
 <script>
-// Початкова форма
 var form = { type: 'expense', user: 'Чоловік', curr: 'UAH' };
 var list = [];
 
-// Функція перемикання кнопок
 function set(p, v) {
     form[p] = v;
     if (p === 'type') {
@@ -115,7 +109,6 @@ function set(p, v) {
     if (p === 'user') {
         document.getElementById('u-Чоловік').className = "btn " + (v === 'Чоловік' ? 'active' : '');
         document.getElementById('u-Дружина').className = "btn " + (v === 'Дружина' ? 'active' : '');
-        // При зміні користувача (Чоловік/Дружина) — завантажуємо саме його/її локальний бюджет
         load();
     }
     if (p === 'curr') {
@@ -125,7 +118,6 @@ function set(p, v) {
     }
 }
 
-// Додавання нового запису
 function add() {
     var am = document.getElementById('amount');
     if (!am.value || parseFloat(am.value) <= 0) return alert('Введіть коректну суму!');
@@ -133,7 +125,7 @@ function add() {
     var newItem = {
         id: Date.now(),
         type: form.type,
-        user: form.user, // Записується поточний вибраний користувач
+        user: form.user,
         curr: form.curr,
         amount: parseFloat(am.value),
         cat: document.getElementById('category').value,
@@ -146,14 +138,12 @@ function add() {
     update();
 }
 
-// Видалення одного конкретного запису
 function deleteItem(id) {
     list = list.filter(function(item) { return item.id !== id; });
     saveToStorage();
     update();
 }
 
-// Очищення всієї історії для поточного профілю
 function clearAll() {
     if (confirm("Ви впевнені, що хочете повністю видалити історію для профілю: " + form.user + "?")) {
         list = [];
@@ -162,13 +152,11 @@ function clearAll() {
     }
 }
 
-// Збереження у LocalStorage (ключ залежить від того, Хто вибраний: Чоловік чи Дружина)
 function saveToStorage() {
     var storageKey = 'budget_data_' + form.user;
     localStorage.setItem(storageKey, JSON.stringify(list));
 }
 
-// Завантаження даних з LocalStorage
 function load() {
     var storageKey = 'budget_data_' + form.user;
     var localData = localStorage.getItem(storageKey);
@@ -176,7 +164,6 @@ function load() {
     update();
 }
 
-// Оновлення інтерфейсу та прорахунок балансів
 function update() {
     var el = document.getElementById('list');
     el.innerHTML = '';
@@ -187,16 +174,13 @@ function update() {
     }
 
     list.forEach(function(t) {
-        // Рахуємо баланс
         bal[t.curr] += (t.type === 'income' ? t.amount : -t.amount);
         
-        // Колір та знак суми
         var isIncome = t.type === 'income';
         var color = isIncome ? '#059669' : '#ef4444';
         var sign = isIncome ? '+' : '-';
         var borderClass = isIncome ? 'item-income' : 'item-expense';
         
-        // Рендеримо елемент списку
         el.innerHTML += '<div class="item ' + borderClass + '">' +
             '<div class="item-info">' +
                 '<b>' + t.cat + '</b>' +
@@ -209,13 +193,11 @@ function update() {
         '</div>';
     });
     
-    // Оновлюємо цифри балансу на плашці
     ['UAH', 'USD', 'EUR', 'PLN'].forEach(function(c) {
         document.getElementById('b-' + c).innerText = bal[c].toFixed(2);
     });
 }
 
-// Перший запуск програми
 load();
 </script>
 </body>
