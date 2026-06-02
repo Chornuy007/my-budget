@@ -1,17 +1,222 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Наш Бюджет</title><style>body{font-family:sans-serif;background:#f9fafb;margin:0;padding:16px;color:#111827}header{background:#059669;color:#fff;padding:12px;border-radius:12px;margin-bottom:15px;text-align:center}.card{background:#fff;padding:12px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.1);margin-bottom:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}.btn{background:#f3f4f6;color:#4b5563;border:1px solid #e5e7eb;padding:10px;border-radius:8px;font-weight:600;cursor:pointer;width:100%}.active{background:#059669!important;color:#fff!important}.input{width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:8px;font-size:16px;box-sizing:border-box;margin-bottom:10px}.submit{width:100%;background:#059669;color:#fff;border:none;padding:12px;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer}.item{background:#fff;padding:10px;border-radius:8px;margin-bottom:6px;display:flex;justify-content:space-between;box-shadow:0 1px 2px rgba(0,0,0,0.05)}</style></head><body><header><h2>🍏 НАШ БЮДЖЕТ</h2></header>
-<div class="card" style="background:#059669;color:#fff"><div class="grid"><div>UAH: <b id="b-UAH">0.00</b></div><div>USD: <b id="b-USD">0.00</b></div><div>EUR: <b id="b-EUR">0.00</b></div><div>PLN: <b id="b-PLN">0.00</b></div></div></div>
-<div class="card"><div class="grid"><button onclick="set('type','expense')" id="t-expense" class="btn active">💸 Витрата</button><button onclick="set('type','income')" id="t-income" class="btn">📈 Дохід</button></div>
-<div class="grid"><button onclick="set('user','Чоловік')" id="u-Чоловік" class="btn active">🙋‍♂️ Чоловік</button><button onclick="set('user','Дружина')" id="u-Дружина" class="btn">🙋‍♀️ Дружина</button></div>
-<div class="grid-4"><button onclick="set('curr','UAH')" id="c-UAH" class="btn active">UAH</button><button onclick="set('curr','USD')" id="c-USD" class="btn">USD</button><button onclick="set('curr','EUR')" id="c-EUR" class="btn">EUR</button><button onclick="set('curr','PLN')" id="c-PLN" class="btn">PLN</button></div>
-<input type="number" id="amount" placeholder="Сума 0.00" class="input" inputmode="decimal">
-<select id="category" class="input"><option value="🛒 Продукти">🛒 Продукти</option><option value="🏠 Комуналка">🏠 Комуналка</option><option value="👶 Дитина">👶 Дитина</option><option value="✨ Інше">✨ Інше</option></select>
-<button onclick="add()" class="submit">💾 Зберегти в хмару</button></div><label>Історія операцій (Реальний час)</label><div id="list"></div>
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Мій Особистий Бюджет</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f3f4f6; margin: 0; padding: 16px; color: #111827; }
+        header { background: #059669; color: #fff; padding: 14px; border-radius: 14px; margin-bottom: 15px; text-align: center; }
+        header h2 { margin: 0; font-size: 20px; letter-spacing: 0.5px; }
+        
+        /* Стильний блок балансу */
+        .balance-card { background: #059669; color: #fff; padding: 14px; border-radius: 14px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        .balance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; }
+        .balance-item { background: rgba(255, 255, 255, 0.15); padding: 8px; border-radius: 8px; font-size: 14px; }
+        .balance-item b { display: block; font-size: 16px; margin-top: 2px; }
+
+        .card { background: #fff; padding: 16px; border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
+        
+        .btn { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; font-size: 14px; transition: all 0.2s; }
+        .active { background: #059669 !important; color: #fff !important; border-color: #059669 !important; box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2); }
+        
+        .input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px; box-sizing: border-box; margin-bottom: 12px; background: #fff; }
+        .input:focus { outline: none; border-color: #059669; box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1); }
+        
+        .submit { width: 100%; background: #059669; color: #fff; border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.2); }
+        .submit:hover { background: #047857; }
+        
+        .history-label { font-weight: 700; font-size: 14px; color: #374151; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 4px; }
+        .clear-link { color: #ef4444; cursor: pointer; font-size: 12px; font-weight: normal; }
+
+        /* Елементи історії */
+        .item { background: #fff; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.02); border-left: 4px solid #e5e7eb; }
+        .item-expense { border-left-color: #ef4444; }
+        .item-income { border-left-color: #059669; }
+        .item-info { display: flex; flex-direction: column; }
+        .item-info small { color: #6b7280; margin-top: 2px; font-size: 12px; }
+        .item-right { display: flex; align-items: center; gap: 10px; }
+        .delete-btn { color: #9ca3af; border: none; background: none; font-size: 18px; cursor: pointer; padding: 0 4px; }
+        .delete-btn:hover { color: #ef4444; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h2>🍏 МІЙ БЮДЖЕТ</h2>
+</header>
+
+<!-- Блок балансів -->
+<div class="balance-card">
+    <div class="balance-grid">
+        <div class="balance-item">UAH <b id="b-UAH">0.00</b></div>
+        <div class="balance-item">USD <b id="b-USD">0.00</b></div>
+        <div class="balance-item">EUR <b id="b-EUR">0.00</b></div>
+        <div class="balance-item">PLN <b id="b-PLN">0.00</b></div>
+    </div>
+</div>
+
+<div class="card">
+    <!-- Вибір типу -->
+    <div class="grid">
+        <button onclick="set('type','expense')" id="t-expense" class="btn active">💸 Витрата</button>
+        <button onclick="set('type','income')" id="t-income" class="btn">📈 Дохід</button>
+    </div>
+    
+    <!-- Вибір користувача (кожен бачить лише свій вибір) -->
+    <div class="grid">
+        <button onclick="set('user','Чоловік')" id="u-Чоловік" class="btn active">🙋‍♂️ Чоловік</button>
+        <button onclick="set('user','Дружина')" id="u-Дружина" class="btn">🙋‍♀️ Дружина</button>
+    </div>
+    
+    <!-- Вибір валюти -->
+    <div class="grid-4">
+        <button onclick="set('curr','UAH')" id="c-UAH" class="btn active">UAH</button>
+        <button onclick="set('curr','USD')" id="c-USD" class="btn">USD</button>
+        <button onclick="set('curr','EUR')" id="c-EUR" class="btn">EUR</button>
+        <button onclick="set('curr','PLN')" id="c-PLN" class="btn">PLN</button>
+    </div>
+    
+    <!-- Введення суми та категорії -->
+    <input type="number" id="amount" placeholder="Сума 0.00" class="input" inputmode="decimal">
+    
+    <select id="category" class="input">
+        <option value="🛒 Продукти">🛒 Продукти</option>
+        <option value="🏠 Комуналка">🏠 Комуналка</option>
+        <option value="👶 Дитина">👶 Дитина</option>
+        <option value="🚗 Транспорт">🚗 Транспорт</option>
+        <option value="✨ Інше">✨ Інше</option>
+    </select>
+    
+    <button onclick="add()" class="submit">💾 Зберегти локально</button>
+</div>
+
+<!-- Історія -->
+<div class="history-label">
+    <span>Історія операцій (Локальна)</span>
+    <span class="clear-link" onclick="clearAll()">🗑 Очистити все</span>
+</div>
+<div id="list"></div>
+
 <script>
-var form={type:'expense',user:'Чоловік',curr:'UAH'},list=[];
-var dbUrl="https://npoint.io";
-function set(p,v){form[p]=v;if(p==='type'){document.getElementById('t-expense').className="btn "+(v==='expense'?'active':'');document.getElementById('t-income').className="btn "+(v==='income'?'active':'')}if(p==='user'){document.getElementById('u-Чоловік').className="btn "+(v==='Чоловік'?'active':'');document.getElementById('u-Дружина').className="btn "+(v==='Дружина'?'active':'')}if(p==='curr'){['UAH','USD','EUR','PLN'].forEach(function(c){document.getElementById('c-'+c).className="btn "+(v===c?'active':'')})}}
-async function add(){var am=document.getElementById('amount');if(!am.value||am.value<=0)return alert('Введіть суму!');var newItem={id:Date.now(),type:form.type,user:form.user,curr:form.curr,amount:parseFloat(am.value),cat:document.getElementById('category').value};list.unshift(newItem);try{var res=await fetch(dbUrl,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({transactions:list})});if(!res.ok){alert("Помилка сервера");return}am.value='';load()}catch(e){alert("Помилка мережі")}}
-async function load(){try{var res=await fetch(dbUrl),data=await res.json();list=data.transactions||[];update()}catch(e){}}
-function update(){var el=document.getElementById('list');el.innerHTML='';var bal={UAH:0,USD:0,EUR:0,PLN:0};list.forEach(function(t){bal[t.curr]+=(t.type==='income'?t.amount:-t.amount);el.innerHTML+='<div class="item"><small><b>'+t.user+'</b> • '+t.cat+'</small><b style="color:'+(t.type==='income'?'#059669':'#ef4444')+'">'+(t.type==='income'?'+':'-')+t.amount.toFixed(2)+' '+t.curr+'</b></div>'});['UAH','USD','EUR','PLN'].forEach(function(c){document.getElementById('b-'+c).innerText=bal[c].toFixed(2)+' '+c})}
-load();setInterval(load,5000);
-</script></body></html>
+// Початкова форма
+var form = { type: 'expense', user: 'Чоловік', curr: 'UAH' };
+var list = [];
+
+// Функція перемикання кнопок
+function set(p, v) {
+    form[p] = v;
+    if (p === 'type') {
+        document.getElementById('t-expense').className = "btn " + (v === 'expense' ? 'active' : '');
+        document.getElementById('t-income').className = "btn " + (v === 'income' ? 'active' : '');
+    }
+    if (p === 'user') {
+        document.getElementById('u-Чоловік').className = "btn " + (v === 'Чоловік' ? 'active' : '');
+        document.getElementById('u-Дружина').className = "btn " + (v === 'Дружина' ? 'active' : '');
+        // При зміні користувача (Чоловік/Дружина) — завантажуємо саме його/її локальний бюджет
+        load();
+    }
+    if (p === 'curr') {
+        ['UAH', 'USD', 'EUR', 'PLN'].forEach(function(c) {
+            document.getElementById('c-' + c).className = "btn " + (v === c ? 'active' : '');
+        });
+    }
+}
+
+// Додавання нового запису
+function add() {
+    var am = document.getElementById('amount');
+    if (!am.value || parseFloat(am.value) <= 0) return alert('Введіть коректну суму!');
+    
+    var newItem = {
+        id: Date.now(),
+        type: form.type,
+        user: form.user, // Записується поточний вибраний користувач
+        curr: form.curr,
+        amount: parseFloat(am.value),
+        cat: document.getElementById('category').value,
+        date: new Date().toLocaleDateString('uk-UA') + ' ' + new Date().toLocaleTimeString('uk-UA', {hour: '2-digit', minute:'2-digit'})
+    };
+    
+    list.unshift(newItem);
+    saveToStorage();
+    am.value = '';
+    update();
+}
+
+// Видалення одного конкретного запису
+function deleteItem(id) {
+    list = list.filter(function(item) { return item.id !== id; });
+    saveToStorage();
+    update();
+}
+
+// Очищення всієї історії для поточного профілю
+function clearAll() {
+    if (confirm("Ви впевнені, що хочете повністю видалити історію для профілю: " + form.user + "?")) {
+        list = [];
+        saveToStorage();
+        update();
+    }
+}
+
+// Збереження у LocalStorage (ключ залежить від того, Хто вибраний: Чоловік чи Дружина)
+function saveToStorage() {
+    var storageKey = 'budget_data_' + form.user;
+    localStorage.setItem(storageKey, JSON.stringify(list));
+}
+
+// Завантаження даних з LocalStorage
+function load() {
+    var storageKey = 'budget_data_' + form.user;
+    var localData = localStorage.getItem(storageKey);
+    list = localData ? JSON.parse(localData) : [];
+    update();
+}
+
+// Оновлення інтерфейсу та прорахунок балансів
+function update() {
+    var el = document.getElementById('list');
+    el.innerHTML = '';
+    var bal = { UAH: 0, USD: 0, EUR: 0, PLN: 0 };
+    
+    if (list.length === 0) {
+        el.innerHTML = '<div style="text-align:center; color:#9ca3af; padding:20px; font-size:14px;">Записів ще немає</div>';
+    }
+
+    list.forEach(function(t) {
+        // Рахуємо баланс
+        bal[t.curr] += (t.type === 'income' ? t.amount : -t.amount);
+        
+        // Колір та знак суми
+        var isIncome = t.type === 'income';
+        var color = isIncome ? '#059669' : '#ef4444';
+        var sign = isIncome ? '+' : '-';
+        var borderClass = isIncome ? 'item-income' : 'item-expense';
+        
+        // Рендеримо елемент списку
+        el.innerHTML += '<div class="item ' + borderClass + '">' +
+            '<div class="item-info">' +
+                '<b>' + t.cat + '</b>' +
+                '<small>' + t.date + '</small>' +
+            '</div>' +
+            '<div class="item-right">' +
+                '<b style="color:' + color + '">' + sign + t.amount.toFixed(2) + ' ' + t.curr + '</b>' +
+                '<button class="delete-btn" onclick="deleteItem(' + t.id + ')">×</button>' +
+            '</div>' +
+        '</div>';
+    });
+    
+    // Оновлюємо цифри балансу на плашці
+    ['UAH', 'USD', 'EUR', 'PLN'].forEach(function(c) {
+        document.getElementById('b-' + c).innerText = bal[c].toFixed(2);
+    });
+}
+
+// Перший запуск програми
+load();
+</script>
+</body>
+</html>
