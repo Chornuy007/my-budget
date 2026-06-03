@@ -8,28 +8,28 @@
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f3f4f6; margin: 0; padding: 16px; color: #111827; }
         header { background: #059669; color: #fff; padding: 14px; border-radius: 14px; margin-bottom: 15px; text-align: center; }
         header h2 { margin: 0; font-size: 20px; letter-spacing: 0.5px; }
-        
         .balance-card { background: #059669; color: #fff; padding: 14px; border-radius: 14px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 15px; }
         .balance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; }
         .balance-item { background: rgba(255, 255, 255, 0.15); padding: 8px; border-radius: 8px; font-size: 14px; }
         .balance-item b { display: block; font-size: 16px; margin-top: 2px; }
-
         .card { background: #fff; padding: 16px; border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 15px; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
         .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
-        
         .btn { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; font-size: 14px; transition: all 0.2s; }
         .active { background: #059669 !important; color: #fff !important; border-color: #059669 !important; box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2); }
-        
         .input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px; box-sizing: border-box; margin-bottom: 12px; background: #fff; }
         .input:focus { outline: none; border-color: #059669; box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1); }
-        
         .submit { width: 100%; background: #059669; color: #fff; border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.2); }
         .submit:hover { background: #047857; }
-        
-        .history-label { font-weight: 700; font-size: 14px; color: #374151; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 4px; }
+        .analytics-title { font-weight: 700; font-size: 14px; color: #374151; margin-bottom: 8px; padding: 0 4px; }
+        .analytics-card { background: #fff; padding: 12px; border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 15px; font-size: 14px; }
+        .analytics-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #f3f4f6; }
+        .analytics-row:last-child { border-bottom: none; }
+        .analytics-row span { color: #4b5563; }
+        .analytics-row b { color: #111827; }
+        .history-header { background: #fff; padding: 12px; border-radius: 14px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .history-label { font-weight: 700; font-size: 14px; color: #374151; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .clear-link { color: #ef4444; cursor: pointer; font-size: 12px; font-weight: normal; }
-
         .item { background: #fff; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.02); border-left: 4px solid #e5e7eb; }
         .item-expense { border-left-color: #ef4444; }
         .item-income { border-left-color: #059669; }
@@ -41,11 +41,7 @@
     </style>
 </head>
 <body>
-
-<header>
-    <h2>🍏 МІЙ БЮДЖЕТ</h2>
-</header>
-
+<header><h2>🍏 МІЙ БЮДЖЕТ</h2></header>
 <div class="balance-card">
     <div class="balance-grid">
         <div class="balance-item">UAH <b id="b-UAH">0.00</b></div>
@@ -54,30 +50,23 @@
         <div class="balance-item">PLN <b id="b-PLN">0.00</b></div>
     </div>
 </div>
-
 <div class="card">
     <div class="grid">
         <button onclick="set('type','expense')" id="t-expense" class="btn active">💸 Витрата</button>
         <button onclick="set('type','income')" id="t-income" class="btn">📈 Дохід</button>
     </div>
-    
     <div class="grid">
         <button onclick="set('user','Чоловік')" id="u-Чоловік" class="btn active">🙋‍♂️ Чоловік</button>
         <button onclick="set('user','Дружина')" id="u-Дружина" class="btn">🙋‍♀️ Дружина</button>
     </div>
-    
     <div class="grid-4">
         <button onclick="set('curr','UAH')" id="c-UAH" class="btn active">UAH</button>
         <button onclick="set('curr','USD')" id="c-USD" class="btn">USD</button>
         <button onclick="set('curr','EUR')" id="c-EUR" class="btn">EUR</button>
         <button onclick="set('curr','PLN')" id="c-PLN" class="btn">PLN</button>
     </div>
-    
-    <input type="number" id="amount" placeholder="Сума 0.00" class="input" inputmode="decimal">
-    
-    <!-- Оновлений список категорій з додаванням Зарплати, Чоловіка та Дружини -->
+    <input type="number" id="amount" placeholder="Сума 0.00" class="input" inputmode="decimal" step="0.01">
     <select id="category" class="input">
-        <option value="💰 Зарплата / Дохід">💰 Зарплата / Дохід</option>
         <option value="🛒 Продукти">🛒 Продукти</option>
         <option value="🚗 Авто / Транспорт">🚗 Авто / Транспорт</option>
         <option value="🏠 Комуналка та Інтернет">🏠 Комуналка та Інтернет</option>
@@ -87,27 +76,35 @@
         <option value="👶 Дитина">👶 Дитина</option>
         <option value="👔 Чоловік (Особисті)">👔 Чоловік (Особисті)</option>
         <option value="👗 Дружина (Особисті)">👗 Дружина (Особисті)</option>
+        <option value="💰 Зарплата / Дохід">💰 Зарплата / Дохід</option>
         <option value="✨ Інше">✨ Інше</option>
     </select>
-    
-    <button onclick="add()" class="submit">💾 Зберегти локально</button>
+    <button onclick="add()" class="submit">💾 Зберегти запис</button>
 </div>
-
-<div class="history-label">
-    <span>Історія операцій (Локальна)</span>
-    <span class="clear-link" onclick="clearAll()">🗑 Очистити все</span>
+<div class="analytics-title">📊 Сума витрат за категоріями:</div>
+<div class="analytics-card" id="analytics-box">
+    <div style="text-align:center; color:#9ca3af;">Немає витрат для розрахунку</div>
+</div>
+<div class="history-header">
+    <div class="history-label">
+        <span>Історія операцій</span>
+        <span class="clear-link" onclick="clearAll()">🗑 Очистити</span>
+    </div>
+    <select id="monthFilter" class="input" style="margin-bottom:0; padding:8px; font-size:14px;" onchange="update()">
+        <option value="all">Усі записи (За весь час)</option>
+    </select>
 </div>
 <div id="list"></div>
-
 <script>
 var form = { type: 'expense', user: 'Чоловік', curr: 'UAH' };
 var list = [];
-
 function set(p, v) {
     form[p] = v;
     if (p === 'type') {
         document.getElementById('t-expense').className = "btn " + (v === 'expense' ? 'active' : '');
         document.getElementById('t-income').className = "btn " + (v === 'income' ? 'active' : '');
+        var catSelect = document.getElementById('category');
+        if(v === 'income') { catSelect.value = "💰 Зарплата / Дохід"; } else { catSelect.value = "🛒 Продукти"; }
     }
     if (p === 'user') {
         document.getElementById('u-Чоловік').className = "btn " + (v === 'Чоловік' ? 'active' : '');
@@ -120,11 +117,10 @@ function set(p, v) {
         });
     }
 }
-
 function add() {
     var am = document.getElementById('amount');
     if (!am.value || parseFloat(am.value) <= 0) return alert('Введіть коректну суму!');
-    
+    var now = new Date();
     var newItem = {
         id: Date.now(),
         type: form.type,
@@ -132,75 +128,90 @@ function add() {
         curr: form.curr,
         amount: parseFloat(am.value),
         cat: document.getElementById('category').value,
-        date: new Date().toLocaleDateString('uk-UA') + ' ' + new Date().toLocaleTimeString('uk-UA', {hour: '2-digit', minute:'2-digit'})
+        date: now.toLocaleDateString('uk-UA') + ' ' + now.toLocaleTimeString('uk-UA', {hour: '2-digit', minute:'2-digit'}),
+        monthKey: now.toLocaleString('uk-UA', { month: 'long', year: 'numeric' })
     };
-    
     list.unshift(newItem);
     saveToStorage();
     am.value = '';
+    set('type', 'expense');
+    buildMonthFilter();
     update();
 }
-
 function deleteItem(id) {
     list = list.filter(function(item) { return item.id !== id; });
     saveToStorage();
+    buildMonthFilter();
     update();
 }
-
 function clearAll() {
     if (confirm("Ви впевнені, що хочете повністю видалити історію для профілю: " + form.user + "?")) {
-        list = [];
-        saveToStorage();
-        update();
+        list = []; saveToStorage(); buildMonthFilter(); update();
     }
 }
-
 function saveToStorage() {
     var storageKey = 'budget_data_' + form.user;
     localStorage.setItem(storageKey, JSON.stringify(list));
 }
-
 function load() {
     var storageKey = 'budget_data_' + form.user;
     var localData = localStorage.getItem(storageKey);
     list = localData ? JSON.parse(localData) : [];
+    buildMonthFilter();
     update();
 }
-
+function buildMonthFilter() {
+    var filter = document.getElementById('monthFilter');
+    var selectedValue = filter.value;
+    filter.innerHTML = '<option value="all">Усі записи (За весь час)</option>';
+    var months = [];
+    list.forEach(function(item) {
+        if(item.monthKey && !months.includes(item.monthKey)) { months.push(item.monthKey); }
+    });
+    months.forEach(function(m) { filter.innerHTML += '<option value="' + m + '">' + m + '</option>'; });
+    if (months.includes(selectedValue)) { filter.value = selectedValue; }
+}
 function update() {
     var el = document.getElementById('list');
-    el.innerHTML = '';
+    var analyticsBox = document.getElementById('analytics-box');
+    el.innerHTML = ''; analyticsBox.innerHTML = '';
     var bal = { UAH: 0, USD: 0, EUR: 0, PLN: 0 };
-    
-    if (list.length === 0) {
-        el.innerHTML = '<div style="text-align:center; color:#9ca3af; padding:20px; font-size:14px;">Записів ще немає</div>';
+    var catTotals = {};
+    var filterVal = document.getElementById('monthFilter').value;
+    var filteredList = list.filter(function(t) { return filterVal === 'all' || t.monthKey === filterVal; });
+    if (filteredList.length === 0) {
+        el.innerHTML = '<div style="text-align:center; color:#9ca3af; padding:20px; font-size:14px;">Немає записів</div>';
+        analyticsBox.innerHTML = '<div style="text-align:center; color:#9ca3af;">Немає витрат</div>';
     }
-
-    list.forEach(function(t) {
+    filteredList.forEach(function(t) {
         bal[t.curr] += (t.type === 'income' ? t.amount : -t.amount);
-        
+        if (t.type === 'expense') {
+            if (!catTotals[t.cat]) { catTotals[t.cat] = { UAH: 0, USD: 0, EUR: 0, PLN: 0 }; }
+            catTotals[t.cat][t.curr] += t.amount;
+        }
         var isIncome = t.type === 'income';
         var color = isIncome ? '#059669' : '#ef4444';
         var sign = isIncome ? '+' : '-';
         var borderClass = isIncome ? 'item-income' : 'item-expense';
-        
         el.innerHTML += '<div class="item ' + borderClass + '">' +
-            '<div class="item-info">' +
-                '<b>' + t.cat + '</b>' +
-                '<small>' + t.date + '</small>' +
-            '</div>' +
-            '<div class="item-right">' +
-                '<b style="color:' + color + '">' + sign + t.amount.toFixed(2) + ' ' + t.curr + '</b>' +
-                '<button class="delete-btn" onclick="deleteItem(' + t.id + ')">×</button>' +
-            '</div>' +
-        '</div>';
+            '<div class="item-info"><b>' + t.cat + '</b><small>' + t.date + '</small></div>' +
+            '<div class="item-right"><b style="color:' + color + '">' + sign + t.amount.toFixed(2) + ' ' + t.curr + '</b>' +
+            '<button class="delete-btn" onclick="deleteItem(' + t.id + ')">×</button></div></div>';
     });
-    
-    ['UAH', 'USD', 'EUR', 'PLN'].forEach(function(c) {
-        document.getElementById('b-' + c).innerText = bal[c].toFixed(2);
-    });
+    var hasExpenses = false;
+    for (var cat in catTotals) {
+        var currencyStrings = [];
+        ['UAH', 'USD', 'EUR', 'PLN'].forEach(function(c) {
+            if (catTotals[cat][c] > 0) { currencyStrings.push(catTotals[cat][c].toFixed(2) + ' ' + c); }
+        });
+        if (currencyStrings.length > 0) {
+            hasExpenses = true;
+            analyticsBox.innerHTML += '<div class="analytics-row"><span>' + cat + '</span><b>' + currencyStrings.join(' | ') + '</b></div>';
+        }
+    }
+    if (!hasExpenses && filteredList.length > 0) { analyticsBox.innerHTML = '<div style="text-align:center; color:#9ca3af;">Лише доходи</div>'; }
+    ['UAH', 'USD', 'EUR', 'PLN'].forEach(function(c) { document.getElementById('b-' + c).innerText = bal[c].toFixed(2); });
 }
-
 load();
 </script>
 </body>
