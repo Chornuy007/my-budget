@@ -1,35 +1,30 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>Мій Особистий Бюджет</title>
+    <title>Мій Особистий Бюджет — Supabase</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f3f4f6; margin: 0; padding: 16px; color: #111827; }
-        header { background: #059669; color: #fff; padding: 14px; border-radius: 14px; margin-bottom: 15px; text-align: center; }
-        header h2 { margin: 0; font-size: 20px; letter-spacing: 0.5px; }
+        header { background: #059669; color: #fff; padding: 14px; border-radius: 14px; margin-bottom: 15px; text-align: center; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+        header h2 { margin: 0; font-size: 18px; letter-spacing: 0.5px; }
+        .right { display:flex; gap:8px; align-items:center; }
+        .small-btn { background: #fff; color: #059669; border: none; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-weight:700; }
+        .card { background: #fff; padding: 16px; border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 15px; }
         .balance-card { background: #059669; color: #fff; padding: 14px; border-radius: 14px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 15px; }
         .balance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; }
         .balance-item { background: rgba(255, 255, 255, 0.15); padding: 8px; border-radius: 8px; font-size: 14px; }
         .balance-item b { display: block; font-size: 16px; margin-top: 2px; }
-        .card { background: #fff; padding: 16px; border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 15px; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
         .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
         .btn { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; font-size: 14px; transition: all 0.2s; }
         .active { background: #059669 !important; color: #fff !important; border-color: #059669 !important; box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2); }
         .input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px; box-sizing: border-box; margin-bottom: 12px; background: #fff; }
-        .input:focus { outline: none; border-color: #059669; box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1); }
         .submit { width: 100%; background: #059669; color: #fff; border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.2); }
-        .submit:hover { background: #047857; }
         .analytics-title { font-weight: 700; font-size: 14px; color: #374151; margin-bottom: 8px; padding: 0 4px; }
         .analytics-card { background: #fff; padding: 12px; border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 15px; font-size: 14px; }
         .analytics-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #f3f4f6; }
-        .analytics-row:last-child { border-bottom: none; }
-        .analytics-row span { color: #4b5563; }
-        .analytics-row b { color: #111827; }
         .history-header { background: #fff; padding: 12px; border-radius: 14px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .history-label { font-weight: 700; font-size: 14px; color: #374151; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .clear-link { color: #ef4444; cursor: pointer; font-size: 12px; font-weight: normal; }
         .item { background: #fff; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.02); border-left: 4px solid #e5e7eb; }
         .item-expense { border-left-color: #ef4444; }
         .item-income { border-left-color: #059669; }
@@ -38,10 +33,31 @@
         .item-right { display: flex; align-items: center; gap: 10px; }
         .delete-btn { color: #9ca3af; border: none; background: none; font-size: 18px; cursor: pointer; padding: 0 4px; }
         .delete-btn:hover { color: #ef4444; }
+        .hint { color:#6b7280; font-size:13px; }
     </style>
 </head>
 <body>
-<header><h2>🍏 МІЙ БЮДЖЕТ</h2></header>
+<header>
+    <h2>🍏 МІЙ БЮДЖЕТ — Supabase</h2>
+    <div class="right">
+        <div id="userEmail" class="hint"></div>
+        <button id="btnSignIn" class="small-btn">Увійти</button>
+        <button id="btnSignOut" class="small-btn" style="display:none;">Вийти</button>
+    </div>
+</header>
+
+<div class="card" id="authCard" style="display:none;">
+    <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <input id="authEmail" class="input" placeholder="Email" />
+        <input id="authPassword" type="password" class="input" placeholder="Пароль" />
+    </div>
+    <div style="display:flex; gap:8px;">
+        <button id="signUpBtn" class="btn">Зареєструватися</button>
+        <button id="signInBtn" class="btn">Увійти</button>
+    </div>
+    <div class="hint" style="margin-top:10px;">Після входу введіть familyId — інша людина має ввести той самий familyId для спільного доступу.</div>
+</div>
+
 <div class="balance-card">
     <div class="balance-grid">
         <div class="balance-item">UAH <b id="b-UAH">0.00</b></div>
@@ -50,7 +66,13 @@
         <div class="balance-item">PLN <b id="b-PLN">0.00</b></div>
     </div>
 </div>
-<div class="card">
+
+<div class="card" id="mainCard" style="display:none;">
+    <div style="margin-bottom:10px; display:flex; gap:8px; align-items:center;">
+        <input id="familyId" class="input" placeholder="familyId (введіть спільний ключ)" style="flex:1;" />
+        <button id="joinFamily" class="small-btn">Join</button>
+    </div>
+    <div id="statusMessage" style="margin-bottom:12px; padding:10px 12px; border-radius:10px; display:none; font-size:14px;"></div>
     <div class="grid">
         <button onclick="set('type','expense')" id="t-expense" class="btn active">💸 Витрата</button>
         <button onclick="set('type','income')" id="t-income" class="btn">📈 Дохід</button>
@@ -81,138 +103,315 @@
     </select>
     <button onclick="add()" class="submit">💾 Зберегти запис</button>
 </div>
+
 <div class="analytics-title">📊 Сума витрат за категоріями:</div>
 <div class="analytics-card" id="analytics-box">
     <div style="text-align:center; color:#9ca3af;">Немає витрат для розрахунку</div>
 </div>
+
 <div class="history-header">
     <div class="history-label">
         <span>Історія операцій</span>
-        <span class="clear-link" onclick="clearAll()">🗑 Очистити</span>
+        <span class="clear-link" onclick="clearFamily()">🗑 Очистити сім'ю</span>
     </div>
-    <select id="monthFilter" class="input" style="margin-bottom:0; padding:8px; font-size:14px;" onchange="update()">
+    <select id="monthFilter" class="input" style="margin-bottom:0; padding:8px; font-size:14px;" onchange="updateUI()">
         <option value="all">Усі записи (За весь час)</option>
     </select>
 </div>
 <div id="list"></div>
+
+<script src="./supabase.min.js"></script>
 <script>
+const SUPABASE_URL = 'https://yojoptbppvfiajzlkaxz.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_ttPPbDW28tXCvLG7UO9IXw_c0ntjBHW';
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 var form = { type: 'expense', user: 'Чоловік', curr: 'UAH' };
-var list = [];
+var familyId = null;
+var currentUser = null;
+var btnSignIn;
+var btnSignOut;
+var authCard;
+var mainCard;
+var statusMessage;
+
+function initUI() {
+    btnSignIn = document.getElementById('btnSignIn');
+    btnSignOut = document.getElementById('btnSignOut');
+    authCard = document.getElementById('authCard');
+    mainCard = document.getElementById('mainCard');
+
+    btnSignIn.addEventListener('click', () => {
+        console.log('Sign in button clicked');
+        authCard.style.display = 'block';
+    });
+    btnSignOut.addEventListener('click', signOut);
+    document.getElementById('signUpBtn').addEventListener('click', signUp);
+    document.getElementById('signInBtn').addEventListener('click', signIn);
+    document.getElementById('joinFamily').addEventListener('click', joinFamily);
+    statusMessage = document.getElementById('statusMessage');
+}
+
+document.addEventListener('DOMContentLoaded', initUI);
+
+async function signUp() {
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value.trim();
+    if (!email || !password) return alert('Введіть email і пароль');
+    const { data, error } = await supabaseClient.auth.signUp({ email, password });
+    if (error) {
+        console.error('Signup error:', error);
+        const details = error?.details ? '\n' + error.details : '';
+        return alert('Помилка реєстрації: ' + error.message + details);
+    }
+    alert('Зареєстровано. Перевірте пошту, якщо увімкнено підтвердження. Увійдіть нижче.');
+}
+
+async function signIn() {
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value.trim();
+    if (!email || !password) return alert('Введіть email і пароль');
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) {
+        console.error('Signin error:', error);
+        const details = error?.details ? '\n' + error.details : '';
+        return alert('Помилка входу: ' + error.message + details);
+    }
+    currentUser = data.user;
+    onAuthChange();
+}
+
+async function signOut() {
+    await supabaseClient.auth.signOut();
+    currentUser = null;
+    familyId = null;
+    document.getElementById('userEmail').innerText = '';
+    btnSignOut.style.display = 'none';
+    btnSignIn.style.display = 'inline-block';
+    authCard.style.display = 'none';
+    mainCard.style.display = 'none';
+    showStatus('');
+}
+
+function onAuthChange() {
+    authCard.style.display = 'none';
+    btnSignIn.style.display = 'none';
+    btnSignOut.style.display = 'inline-block';
+    document.getElementById('userEmail').innerText = currentUser.email;
+    mainCard.style.display = 'block';
+    loadProfile();
+}
+
+async function loadProfile() {
+    const { data, error } = await supabaseClient.from('profiles').select('family_id').eq('id', currentUser.id).single();
+    if (error) {
+        console.error('Profile load error:', error);
+        return;
+    }
+    if (data && data.family_id) {
+        familyId = data.family_id;
+        document.getElementById('familyId').value = familyId;
+        startRealtime();
+        loadEntries();
+    }
+}
+
+async function joinFamily() {
+    const v = document.getElementById('familyId').value.trim();
+    if (!v) return showStatus('Введіть familyId', 'error');
+    familyId = v;
+    const { error } = await supabaseClient.from('profiles').upsert([{ id: currentUser.id, email: currentUser.email, family_id: familyId }]);
+    if (error) {
+        console.error('Join family error:', error);
+        return showStatus('Помилка підключення до familyId: ' + error.message, 'error');
+    }
+    startRealtime();
+    await loadEntries();
+    showStatus('Підключено до familyId: ' + familyId, 'success');
+}
+
 function set(p, v) {
     form[p] = v;
     if (p === 'type') {
-        document.getElementById('t-expense').className = "btn " + (v === 'expense' ? 'active' : '');
-        document.getElementById('t-income').className = "btn " + (v === 'income' ? 'active' : '');
-        var catSelect = document.getElementById('category');
-        if(v === 'income') { catSelect.value = "💰 Зарплата / Дохід"; } else { catSelect.value = "🛒 Продукти"; }
+        document.getElementById('t-expense').className = 'btn ' + (v === 'expense' ? 'active' : '');
+        document.getElementById('t-income').className = 'btn ' + (v === 'income' ? 'active' : '');
+        document.getElementById('category').value = v === 'income' ? '💰 Зарплата / Дохід' : '🛒 Продукти';
     }
     if (p === 'user') {
-        document.getElementById('u-Чоловік').className = "btn " + (v === 'Чоловік' ? 'active' : '');
-        document.getElementById('u-Дружина').className = "btn " + (v === 'Дружина' ? 'active' : '');
-        load();
+        document.getElementById('u-Чоловік').className = 'btn ' + (v === 'Чоловік' ? 'active' : '');
+        document.getElementById('u-Дружина').className = 'btn ' + (v === 'Дружина' ? 'active' : '');
     }
     if (p === 'curr') {
-        ['UAH', 'USD', 'EUR', 'PLN'].forEach(function(c) {
-            document.getElementById('c-' + c).className = "btn " + (v === c ? 'active' : '');
+        ['UAH', 'USD', 'EUR', 'PLN'].forEach(c => {
+            document.getElementById('c-' + c).className = 'btn ' + (v === c ? 'active' : '');
         });
     }
 }
-function add() {
-    var am = document.getElementById('amount');
-    if (!am.value || parseFloat(am.value) <= 0) return alert('Введіть коректну суму!');
-    var now = new Date();
-    var newItem = {
-        id: Date.now(),
+
+async function add() {
+    if (!currentUser) return showStatus('Увійдіть, будь ласка', 'error');
+    if (!familyId) return showStatus('Підключіться до familyId через Join', 'error');
+    const amount = parseFloat(document.getElementById('amount').value);
+    if (!amount || amount <= 0) return showStatus('Введіть коректну суму', 'error');
+    const now = new Date();
+    const newItem = {
+        user_id: currentUser.id,
+        family_id: familyId,
         type: form.type,
-        user: form.user,
+        user_name: form.user,
         curr: form.curr,
-        amount: parseFloat(am.value),
+        amount: amount,
         cat: document.getElementById('category').value,
-        date: now.toLocaleDateString('uk-UA') + ' ' + now.toLocaleTimeString('uk-UA', {hour: '2-digit', minute:'2-digit'}),
-        monthKey: now.toLocaleString('uk-UA', { month: 'long', year: 'numeric' })
+        date: now.toISOString(),
+        month_key: now.toLocaleString('uk-UA', { month: 'long', year: 'numeric' })
     };
-    list.unshift(newItem);
-    saveToStorage();
-    am.value = '';
-    set('type', 'expense');
-    buildMonthFilter();
-    update();
-}
-function deleteItem(id) {
-    list = list.filter(function(item) { return item.id !== id; });
-    saveToStorage();
-    buildMonthFilter();
-    update();
-}
-function clearAll() {
-    if (confirm("Ви впевнені, що хочете повністю видалити історію для профілю: " + form.user + "?")) {
-        list = []; saveToStorage(); buildMonthFilter(); update();
+    const { error } = await supabaseClient.from('entries').insert([newItem]);
+    if (error) {
+        console.error('Entry insert error:', error);
+        if (error.message && error.message.includes('new row violates row-level security policy for table "entries"')) {
+            return showStatus('Помилка збереження: спочатку натисніть Join і переконайтесь, що профіль у Supabase має family_id.', 'error');
+        }
+        return showStatus('Помилка збереження: ' + error.message, 'error');
     }
+    document.getElementById('amount').value = '';
+    await loadEntries();
+    // Показати успіх, зосередити поле суми і прокрутити до нового запису
+    showStatus('Запис збережено успішно.', 'success');
+    const amountEl = document.getElementById('amount');
+    if (amountEl) {
+        amountEl.focus();
+    }
+    // Прокрутити до першого елемента списку (останній запис зверху)
+    setTimeout(() => {
+        const list = document.getElementById('list');
+        const first = list && list.querySelector('.item');
+        if (first) first.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 120);
 }
-function saveToStorage() {
-    var storageKey = 'budget_data_' + form.user;
-    localStorage.setItem(storageKey, JSON.stringify(list));
-}
-function load() {
-    var storageKey = 'budget_data_' + form.user;
-    var localData = localStorage.getItem(storageKey);
-    list = localData ? JSON.parse(localData) : [];
+
+async function loadEntries() {
+    if (!familyId) return;
+    const { data, error } = await supabaseClient.from('entries').select('*').eq('family_id', familyId).order('id', { ascending: false });
+    if (error) return console.error(error);
+    window._entries = data || [];
     buildMonthFilter();
-    update();
+    updateUI();
 }
+
+let channel = null;
+function startRealtime() {
+    if (channel) channel.unsubscribe();
+    channel = supabaseClient.channel('public:entries')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'entries', filter: 'family_id=eq.' + familyId }, () => loadEntries())
+        .subscribe();
+}
+
+async function deleteItem(id) {
+    if (!confirm('Видалити запис?')) return;
+    const { error } = await supabaseClient.from('entries').delete().eq('id', id);
+    if (error) alert(error.message);
+    loadEntries();
+}
+
+async function clearFamily() {
+    if (!familyId) return alert('Немає familyId');
+    if (!confirm('Видалити всі записи сімʼї: ' + familyId + '?')) return;
+    const { error } = await supabaseClient.from('entries').delete().eq('family_id', familyId);
+    if (error) alert(error.message);
+    loadEntries();
+}
+
 function buildMonthFilter() {
-    var filter = document.getElementById('monthFilter');
-    var selectedValue = filter.value;
+    const filter = document.getElementById('monthFilter');
+    const current = filter.value;
     filter.innerHTML = '<option value="all">Усі записи (За весь час)</option>';
-    var months = [];
-    list.forEach(function(item) {
-        if(item.monthKey && !months.includes(item.monthKey)) { months.push(item.monthKey); }
+    const months = [];
+    (window._entries || []).forEach(item => {
+        if (item.month_key && !months.includes(item.month_key)) months.push(item.month_key);
     });
-    months.forEach(function(m) { filter.innerHTML += '<option value="' + m + '">' + m + '</option>'; });
-    if (months.includes(selectedValue)) { filter.value = selectedValue; }
+    months.forEach(m => {
+        filter.innerHTML += '<option value="' + m + '">' + m + '</option>';
+    });
+    if (months.includes(current)) filter.value = current;
 }
-function update() {
-    var el = document.getElementById('list');
-    var analyticsBox = document.getElementById('analytics-box');
-    el.innerHTML = ''; analyticsBox.innerHTML = '';
-    var bal = { UAH: 0, USD: 0, EUR: 0, PLN: 0 };
-    var catTotals = {};
-    var filterVal = document.getElementById('monthFilter').value;
-    var filteredList = list.filter(function(t) { return filterVal === 'all' || t.monthKey === filterVal; });
-    if (filteredList.length === 0) {
+
+function showStatus(message, type) {
+    if (!statusMessage) return;
+    if (!message) {
+        statusMessage.style.display = 'none';
+        return;
+    }
+    statusMessage.style.display = 'block';
+    statusMessage.innerText = message;
+    statusMessage.style.background = type === 'success' ? '#d1fae5' : '#fee2e2';
+    statusMessage.style.color = type === 'success' ? '#065f46' : '#991b1b';
+    statusMessage.style.border = type === 'success' ? '1px solid #10b981' : '1px solid #ef4444';
+}
+
+function updateUI() {
+    const el = document.getElementById('list');
+    const analyticsBox = document.getElementById('analytics-box');
+    el.innerHTML = '';
+    analyticsBox.innerHTML = '';
+    const bal = { UAH: 0, USD: 0, EUR: 0, PLN: 0 };
+    const catTotals = {};
+    const filterVal = document.getElementById('monthFilter').value;
+    const filtered = (window._entries || []).filter(item => filterVal === 'all' || item.month_key === filterVal);
+    if (filtered.length === 0) {
         el.innerHTML = '<div style="text-align:center; color:#9ca3af; padding:20px; font-size:14px;">Немає записів</div>';
         analyticsBox.innerHTML = '<div style="text-align:center; color:#9ca3af;">Немає витрат</div>';
     }
-    filteredList.forEach(function(t) {
-        bal[t.curr] += (t.type === 'income' ? t.amount : -t.amount);
-        if (t.type === 'expense') {
-            if (!catTotals[t.cat]) { catTotals[t.cat] = { UAH: 0, USD: 0, EUR: 0, PLN: 0 }; }
-            catTotals[t.cat][t.curr] += t.amount;
+    filtered.forEach(item => {
+        bal[item.curr] += item.type === 'income' ? item.amount : -item.amount;
+        if (item.type === 'expense') {
+            if (!catTotals[item.cat]) catTotals[item.cat] = { UAH: 0, USD: 0, EUR: 0, PLN: 0 };
+            catTotals[item.cat][item.curr] += item.amount;
         }
-        var isIncome = t.type === 'income';
-        var color = isIncome ? '#059669' : '#ef4444';
-        var sign = isIncome ? '+' : '-';
-        var borderClass = isIncome ? 'item-income' : 'item-expense';
+        const isIncome = item.type === 'income';
+        const color = isIncome ? '#059669' : '#ef4444';
+        const sign = isIncome ? '+' : '-';
+        const borderClass = isIncome ? 'item-income' : 'item-expense';
         el.innerHTML += '<div class="item ' + borderClass + '">' +
-            '<div class="item-info"><b>' + t.cat + '</b><small>' + t.date + '</small></div>' +
-            '<div class="item-right"><b style="color:' + color + '">' + sign + t.amount.toFixed(2) + ' ' + t.curr + '</b>' +
-            '<button class="delete-btn" onclick="deleteItem(' + t.id + ')">×</button></div></div>';
+            '<div class="item-info"><b>' + item.cat + '</b><small>' + new Date(item.date).toLocaleString('uk-UA', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit', year:'numeric'}) + '</small></div>' +
+            '<div class="item-right"><b style="color:' + color + '">' + sign + Number(item.amount).toFixed(2) + ' ' + item.curr + '</b>' +
+            '<button class="delete-btn" onclick="deleteItem(' + item.id + ')">×</button></div></div>';
     });
-    var hasExpenses = false;
-    for (var cat in catTotals) {
-        var currencyStrings = [];
-        ['UAH', 'USD', 'EUR', 'PLN'].forEach(function(c) {
-            if (catTotals[cat][c] > 0) { currencyStrings.push(catTotals[cat][c].toFixed(2) + ' ' + c); }
+    let hasExpenses = false;
+    Object.keys(catTotals).forEach(cat => {
+        const currencyStrings = [];
+        ['UAH', 'USD', 'EUR', 'PLN'].forEach(c => {
+            if (catTotals[cat][c] > 0) currencyStrings.push(catTotals[cat][c].toFixed(2) + ' ' + c);
         });
-        if (currencyStrings.length > 0) {
+        if (currencyStrings.length) {
             hasExpenses = true;
             analyticsBox.innerHTML += '<div class="analytics-row"><span>' + cat + '</span><b>' + currencyStrings.join(' | ') + '</b></div>';
         }
-    }
-    if (!hasExpenses && filteredList.length > 0) { analyticsBox.innerHTML = '<div style="text-align:center; color:#9ca3af;">Лише доходи</div>'; }
-    ['UAH', 'USD', 'EUR', 'PLN'].forEach(function(c) { document.getElementById('b-' + c).innerText = bal[c].toFixed(2); });
+    });
+    if (!hasExpenses && filtered.length > 0) analyticsBox.innerHTML = '<div style="text-align:center; color:#9ca3af;">Лише доходи</div>';
+    ['UAH', 'USD', 'EUR', 'PLN'].forEach(c => {
+        document.getElementById('b-' + c).innerText = (bal[c] || 0).toFixed(2);
+    });
 }
-load();
+
+(async function(){
+    const { data } = await supabaseClient.auth.getSession();
+    if (data.session) {
+        currentUser = data.session.user;
+        onAuthChange();
+    }
+})();
+
+window.refreshEntries = loadEntries;
 </script>
+
+<!--
+   Якщо потрібно, нижче можна зберегти інструкції для Supabase.
+   Але сам HTML має бути чистим, щоб не було зайвого тексту внизу.
+-->
 </body>
 </html>
+
+
+
+
