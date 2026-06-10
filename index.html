@@ -1,42 +1,70 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Мій Особистий Бюджет — Supabase</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f3f4f6; margin: 0; padding: 16px; color: #111827; }
-        header { background: #059669; color: #fff; padding: 14px; border-radius: 14px; margin-bottom: 15px; text-align: center; display:flex; align-items:center; justify-content:space-between; gap:12px; }
-        header h2 { margin: 0; font-size: 18px; letter-spacing: 0.5px; }
-        .right { display:flex; gap:8px; align-items:center; }
-        .small-btn { background: #fff; color: #059669; border: none; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-weight:700; }
-        .card { background: #fff; padding: 16px; border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        .balance-card { background: #059669; color: #fff; padding: 14px; border-radius: 14px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 55%, #d1fae5 100%); margin: 0; padding: 0; color: #111827; }
+        .app-container { max-width: 720px; margin: 0 auto; padding: 16px 14px 24px; }
+        header { background: rgba(5, 150, 105, 0.96); color: #fff; padding: 18px 16px; border-radius: 20px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 18px 50px -40px rgba(5, 150, 105, 0.8); }
+        header h2 { margin: 0; font-size: 20px; letter-spacing: 0.3px; line-height: 1.25; }
+        .right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+        .small-btn { background: rgba(255, 255, 255, 0.16); color: #fff; border: 1px solid rgba(255, 255, 255, 0.24); padding: 10px 14px; border-radius: 12px; cursor: pointer; font-weight: 700; box-shadow: 0 10px 20px -15px rgba(0,0,0,0.08); }
+        .card { background: #ffffffee; padding: 18px; border-radius: 20px; box-shadow: 0 18px 30px -22px rgba(15, 23, 42, 0.18); margin-bottom: 16px; border: 1px solid rgba(15, 23, 42, 0.06); }
+        .balance-card { background: #0f766e; color: #fff; padding: 18px; border-radius: 20px; box-shadow: 0 18px 40px -30px rgba(15, 118, 110, 0.8); margin-bottom: 18px; border: 1px solid rgba(255,255,255,0.14); }
         .balance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; }
-        .balance-item { background: rgba(255, 255, 255, 0.15); padding: 8px; border-radius: 8px; font-size: 14px; }
-        .balance-item b { display: block; font-size: 16px; margin-top: 2px; }
+        .balance-item { background: rgba(255, 255, 255, 0.18); padding: 14px 12px; border-radius: 14px; font-size: 13px; color: #f8fafc; }
+        .balance-item b { display: block; font-size: 18px; margin-top: 4px; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
-        .btn { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; font-size: 14px; transition: all 0.2s; }
-        .active { background: #059669 !important; color: #fff !important; border-color: #059669 !important; box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2); }
-        .input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px; box-sizing: border-box; margin-bottom: 12px; background: #fff; }
-        .submit { width: 100%; background: #059669; color: #fff; border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.2); }
-        .analytics-title { font-weight: 700; font-size: 14px; color: #374151; margin-bottom: 8px; padding: 0 4px; }
-        .analytics-card { background: #fff; padding: 12px; border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 15px; font-size: 14px; }
-        .analytics-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #f3f4f6; }
-        .history-header { background: #fff; padding: 12px; border-radius: 14px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .item { background: #fff; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.02); border-left: 4px solid #e5e7eb; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
+        .btn { background: #f8fafc; color: #111827; border: 1px solid #d1d5db; padding: 14px 12px; border-radius: 14px; font-weight: 700; cursor: pointer; width: 100%; font-size: 14px; transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease; box-shadow: 0 8px 20px -16px rgba(15, 23, 42, 0.22); }
+        .btn:hover { transform: translateY(-1px); }
+        .active { background: #059669 !important; color: #fff !important; border-color: #059669 !important; box-shadow: 0 12px 30px -18px rgba(5, 150, 105, 0.45); }
+        .input, select { width: 100%; padding: 14px 12px; border: 1px solid #d1d5db; border-radius: 14px; font-size: 15px; box-sizing: border-box; margin-bottom: 12px; background: #fff; outline: none; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+        .input:focus, select:focus { border-color: #059669; box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.12); }
+        .submit { width: 100%; background: #059669; color: #fff; border: none; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 16px 36px -22px rgba(5, 150, 105, 0.6); }
+        .analytics-title { font-weight: 700; font-size: 15px; color: #0f172a; margin-bottom: 10px; padding: 0 4px; }
+        .analytics-card { background: #fff; padding: 16px; border-radius: 20px; box-shadow: 0 18px 30px -22px rgba(15, 23, 42, 0.12); margin-bottom: 18px; font-size: 14px; }
+        .analytics-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
+        .history-header { background: #fff; padding: 16px; border-radius: 20px; margin-bottom: 14px; box-shadow: 0 18px 30px -22px rgba(15, 23, 42, 0.12); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: center; }
+        .history-label { display: flex; gap: 12px; align-items: center; font-weight: 700; }
+        .clear-link { color: #dc2626; cursor: pointer; font-size: 14px; white-space: nowrap; }
+        .item { background: #fff; padding: 16px; border-radius: 18px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 18px 30px -24px rgba(15, 23, 42, 0.08); border-left: 5px solid #e5e7eb; }
         .item-expense { border-left-color: #ef4444; }
         .item-income { border-left-color: #059669; }
-        .item-info { display: flex; flex-direction: column; }
-        .item-info small { color: #6b7280; margin-top: 2px; font-size: 12px; }
-        .item-right { display: flex; align-items: center; gap: 10px; }
-        .delete-btn { color: #9ca3af; border: none; background: none; font-size: 18px; cursor: pointer; padding: 0 4px; }
+        .item-user-man { background: #ecfdf5; }
+        .item-user-wife { background: #fdf2f8; }
+        .item-info { display: flex; flex-direction: column; max-width: 70%; }
+        .item-info b { display: block; font-size: 15px; margin-bottom: 6px; }
+        .item-info small { color: #6b7280; margin-top: 2px; font-size: 12px; line-height: 1.4; }
+        .item-user-label { display: inline-block; margin-bottom: 8px; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.01em; }
+        .item-user-man .item-user-label { background: rgba(16, 185, 129, 0.15); color: #047857; }
+        .item-user-wife .item-user-label { background: rgba(236, 72, 153, 0.15); color: #be185d; }
+        .item-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+        .delete-btn { color: #9ca3af; border: none; background: none; font-size: 20px; cursor: pointer; padding: 0 4px; }
         .delete-btn:hover { color: #ef4444; }
         .hint { color:#6b7280; font-size:13px; }
+        @media (max-width: 720px) {
+            .app-container { padding: 14px 12px 22px; }
+            header { flex-direction: column; align-items: flex-start; }
+            .right { justify-content: flex-start; width: 100%; }
+            .balance-grid, .grid, .grid-4 { grid-template-columns: 1fr; }
+            .history-header { flex-direction: column; align-items: stretch; }
+            .history-header select { width: 100%; }
+            .item-info { max-width: 100%; }
+            .item-right { justify-content: space-between; width: 100%; }
+        }
+        @media (max-width: 520px) {
+            .small-btn { width: 100%; justify-content: center; }
+            .right { gap: 6px; }
+            .item { flex-direction: column; align-items: stretch; }
+            .item-right { justify-content: space-between; }
+        }
     </style>
 </head>
 <body>
+<div class="app-container">
 <header>
     <h2>🍏 МІЙ БЮДЖЕТ — Supabase</h2>
     <div class="right">
@@ -73,6 +101,16 @@
         <button id="joinFamily" class="small-btn">Join</button>
     </div>
     <div id="statusMessage" style="margin-bottom:12px; padding:10px 12px; border-radius:10px; display:none; font-size:14px;"></div>
+    <div class="card" id="inputSummary" style="margin-bottom:12px; display:none;">
+        <div style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px;">
+            <div><strong>Користувач:</strong> <span id="summaryUser">Чоловік</span></div>
+            <div><strong>Тип:</strong> <span id="summaryType">Витрата</span></div>
+            <div><strong>Валюта:</strong> <span id="summaryCurr">UAH</span></div>
+            <div><strong>Категорія:</strong> <span id="summaryCat">🛒 Продукти</span></div>
+            <div><strong>Сума:</strong> <span id="summaryAmount">0.00</span></div>
+            <div><strong>familyId:</strong> <span id="summaryFamily">—</span></div>
+        </div>
+    </div>
     <div class="grid">
         <button onclick="set('type','expense')" id="t-expense" class="btn active">💸 Витрата</button>
         <button onclick="set('type','income')" id="t-income" class="btn">📈 Дохід</button>
@@ -114,11 +152,19 @@
         <span>Історія операцій</span>
         <span class="clear-link" onclick="clearFamily()">🗑 Очистити сім'ю</span>
     </div>
-    <select id="monthFilter" class="input" style="margin-bottom:0; padding:8px; font-size:14px;" onchange="updateUI()">
-        <option value="all">Усі записи (За весь час)</option>
-    </select>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+        <select id="monthFilter" class="input" style="padding:8px; font-size:14px;" onchange="updateUI()">
+            <option value="all">Усі записи (За весь час)</option>
+        </select>
+        <select id="userFilter" class="input" style="padding:8px; font-size:14px;" onchange="updateUI()">
+            <option value="all">Всі користувачі</option>
+            <option value="Чоловік">Чоловік</option>
+            <option value="Дружина">Дружина</option>
+        </select>
+    </div>
 </div>
 <div id="list"></div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.107.0/dist/umd/supabase.min.js"></script>
 <script>
@@ -135,12 +181,27 @@ var btnSignOut;
 var authCard;
 var mainCard;
 var statusMessage;
+var inputSummary;
+var summaryUser;
+var summaryType;
+var summaryCurr;
+var summaryCat;
+var summaryAmount;
+var summaryFamily;
 
 function initUI() {
     btnSignIn = document.getElementById('btnSignIn');
     btnSignOut = document.getElementById('btnSignOut');
     authCard = document.getElementById('authCard');
     mainCard = document.getElementById('mainCard');
+    statusMessage = document.getElementById('statusMessage');
+    inputSummary = document.getElementById('inputSummary');
+    summaryUser = document.getElementById('summaryUser');
+    summaryType = document.getElementById('summaryType');
+    summaryCurr = document.getElementById('summaryCurr');
+    summaryCat = document.getElementById('summaryCat');
+    summaryAmount = document.getElementById('summaryAmount');
+    summaryFamily = document.getElementById('summaryFamily');
 
     btnSignIn.addEventListener('click', () => {
         console.log('Sign in button clicked');
@@ -150,7 +211,9 @@ function initUI() {
     document.getElementById('signUpBtn').addEventListener('click', signUp);
     document.getElementById('signInBtn').addEventListener('click', signIn);
     document.getElementById('joinFamily').addEventListener('click', joinFamily);
-    statusMessage = document.getElementById('statusMessage');
+    document.getElementById('amount').addEventListener('input', updateFormSummary);
+    document.getElementById('category').addEventListener('change', updateFormSummary);
+    updateFormSummary();
 }
 
 document.addEventListener('DOMContentLoaded', initUI);
@@ -221,6 +284,7 @@ async function joinFamily() {
     const v = document.getElementById('familyId').value.trim();
     if (!v) return showStatus('Введіть familyId', 'error');
     familyId = v;
+    updateFormSummary();
     const { error } = await supabaseClient.from('profiles').upsert([{ id: currentUser.id, email: currentUser.email, family_id: familyId }]);
     if (error) {
         console.error('Join family error:', error);
@@ -247,6 +311,18 @@ function set(p, v) {
             document.getElementById('c-' + c).className = 'btn ' + (v === c ? 'active' : '');
         });
     }
+    updateFormSummary();
+}
+
+function updateFormSummary() {
+    if (!inputSummary) return;
+    inputSummary.style.display = 'block';
+    summaryUser.innerText = form.user;
+    summaryType.innerText = form.type === 'expense' ? 'Витрата' : 'Дохід';
+    summaryCurr.innerText = form.curr;
+    summaryCat.innerText = document.getElementById('category').value;
+    summaryAmount.innerText = parseFloat(document.getElementById('amount').value || 0).toFixed(2);
+    summaryFamily.innerText = familyId || '—';
 }
 
 async function add() {
@@ -357,7 +433,11 @@ function updateUI() {
     const bal = { UAH: 0, USD: 0, EUR: 0, PLN: 0 };
     const catTotals = {};
     const filterVal = document.getElementById('monthFilter').value;
-    const filtered = (window._entries || []).filter(item => filterVal === 'all' || item.month_key === filterVal);
+    const userFilter = document.getElementById('userFilter').value;
+    const filtered = (window._entries || []).filter(item =>
+        (filterVal === 'all' || item.month_key === filterVal) &&
+        (userFilter === 'all' || item.user_name === userFilter)
+    );
     if (filtered.length === 0) {
         el.innerHTML = '<div style="text-align:center; color:#9ca3af; padding:20px; font-size:14px;">Немає записів</div>';
         analyticsBox.innerHTML = '<div style="text-align:center; color:#9ca3af;">Немає витрат</div>';
@@ -372,8 +452,9 @@ function updateUI() {
         const color = isIncome ? '#059669' : '#ef4444';
         const sign = isIncome ? '+' : '-';
         const borderClass = isIncome ? 'item-income' : 'item-expense';
-        el.innerHTML += '<div class="item ' + borderClass + '">' +
-            '<div class="item-info"><b>' + item.cat + '</b><small>' + new Date(item.date).toLocaleString('uk-UA', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit', year:'numeric'}) + '</small></div>' +
+        const userClass = item.user_name === 'Дружина' ? 'item-user-wife' : 'item-user-man';
+        el.innerHTML += '<div class="item ' + borderClass + ' ' + userClass + '">' +
+            '<div class="item-info"><span class="item-user-label">' + item.user_name + '</span><b>' + item.cat + '</b><small>' + new Date(item.date).toLocaleString('uk-UA', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit', year:'numeric'}) + '</small></div>' +
             '<div class="item-right"><b style="color:' + color + '">' + sign + Number(item.amount).toFixed(2) + ' ' + item.curr + '</b>' +
             '<button class="delete-btn" onclick="deleteItem(' + item.id + ')">×</button></div></div>';
     });
