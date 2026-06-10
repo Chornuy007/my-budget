@@ -48,6 +48,8 @@
         .delete-btn { color: #9ca3af; border: none; background: none; font-size: 20px; cursor: pointer; padding: 0 4px; }
         .delete-btn:hover { color: #ef4444; }
         .hint { color:#6b7280; font-size:13px; }
+        .family-row { display: flex; gap: 8px; align-items: center; }
+        .family-row .input { min-width: 0; }
         @media (max-width: 720px) {
             .app-container { padding: 14px 12px 22px; }
             header { flex-direction: column; align-items: flex-start; }
@@ -59,6 +61,8 @@
             .item-right { justify-content: space-between; width: 100%; }
         }
         @media (max-width: 520px) {
+            .family-row { flex-direction: column; align-items: stretch; }
+            .family-row .small-btn { width: 100%; }
             .small-btn { width: 100%; justify-content: center; }
             .right { gap: 6px; }
             .item { flex-direction: column; align-items: stretch; }
@@ -99,8 +103,8 @@
 </div>
 
 <div class="card" id="mainCard" style="display:none;">
-    <div style="margin-bottom:10px; display:flex; gap:8px; align-items:center;">
-        <input id="familyId" class="input" placeholder="familyId (введіть спільний ключ)" style="flex:1;" />
+    <div class="family-row" style="margin-bottom:10px;">
+        <input id="familyId" class="input" placeholder="familyId (введіть спільний ключ)" style="flex:1; min-width:0;" />
         <button id="joinFamily" class="small-btn join-btn">Join</button>
     </div>
     <div id="statusMessage" style="margin-bottom:12px; padding:10px 12px; border-radius:10px; display:none; font-size:14px;"></div>
