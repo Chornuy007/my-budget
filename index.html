@@ -10,7 +10,10 @@
         header { background: rgba(5, 150, 105, 0.96); color: #fff; padding: 18px 16px; border-radius: 20px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 18px 50px -40px rgba(5, 150, 105, 0.8); }
         header h2 { margin: 0; font-size: 20px; letter-spacing: 0.3px; line-height: 1.25; }
         .right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
-        .small-btn { background: rgba(255, 255, 255, 0.16); color: #fff; border: 1px solid rgba(255, 255, 255, 0.24); padding: 10px 14px; border-radius: 12px; cursor: pointer; font-weight: 700; box-shadow: 0 10px 20px -15px rgba(0,0,0,0.08); }
+        .small-btn { background: #059669; color: #fff; border: none; padding: 10px 14px; border-radius: 12px; cursor: pointer; font-weight: 700; box-shadow: 0 10px 20px -15px rgba(0,0,0,0.08); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .small-btn:hover { transform: translateY(-1px); box-shadow: 0 14px 28px -18px rgba(0,0,0,0.14); }
+        .join-btn { background: #2563eb; color: #fff; border: none; }
+        .join-btn:hover { background: #1e40af; }
         .card { background: #ffffffee; padding: 18px; border-radius: 20px; box-shadow: 0 18px 30px -22px rgba(15, 23, 42, 0.18); margin-bottom: 16px; border: 1px solid rgba(15, 23, 42, 0.06); }
         .balance-card { background: #0f766e; color: #fff; padding: 18px; border-radius: 20px; box-shadow: 0 18px 40px -30px rgba(15, 118, 110, 0.8); margin-bottom: 18px; border: 1px solid rgba(255,255,255,0.14); }
         .balance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; }
@@ -98,7 +101,7 @@
 <div class="card" id="mainCard" style="display:none;">
     <div style="margin-bottom:10px; display:flex; gap:8px; align-items:center;">
         <input id="familyId" class="input" placeholder="familyId (введіть спільний ключ)" style="flex:1;" />
-        <button id="joinFamily" class="small-btn">Join</button>
+        <button id="joinFamily" class="small-btn join-btn">Join</button>
     </div>
     <div id="statusMessage" style="margin-bottom:12px; padding:10px 12px; border-radius:10px; display:none; font-size:14px;"></div>
     <div class="card" id="inputSummary" style="margin-bottom:12px; display:none;">
@@ -134,6 +137,7 @@
         <option value="💳 Кредит / Борги">💳 Кредит / Борги</option>
         <option value="🎉 Розваги / Відпочинок">🎉 Розваги / Відпочинок</option>
         <option value="👶 Дитина">👶 Дитина</option>
+        <option value="👕 Одяг">👕 Одяг</option>
         <option value="👔 Чоловік (Особисті)">👔 Чоловік (Особисті)</option>
         <option value="👗 Дружина (Особисті)">👗 Дружина (Особисті)</option>
         <option value="💰 Зарплата / Дохід">💰 Зарплата / Дохід</option>
@@ -275,6 +279,7 @@ async function loadProfile() {
     if (data && data.family_id) {
         familyId = data.family_id;
         document.getElementById('familyId').value = familyId;
+        updateFormSummary();
         startRealtime();
         loadEntries();
     }
